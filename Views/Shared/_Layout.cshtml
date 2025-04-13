@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MvcBooks</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MvcBooks.styles.css" asp-append-version="true" />
+     @* --- ADD THIS LINE --- *@
+    @await RenderSectionAsync("Styles", required: false)
+    @* ------------------- *@
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm custom-navbar box-shadow mb-3">
+            <div class="container-fluid">
+                @* --- Logo Area --- *@
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+               
+                    <img src="~/images/logo.png" alt="MvcBooks Library Logo" class="navbar-logo" />
+                </a>
+                @* --- No other nav items or toggler needed --- *@
+             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end"> @* Use justify-content-end or ms-auto on ul *@
+                    <ul class="navbar-nav">
+                         @* --- Add the Login Partial Here --- *@
+                        <partial name="_LoginPartial" />
+                         @* ---------------------------------- *@
+                    </ul>
+                </div>
+                 @* OR place it outside the collapsible div if always visible *@
+                 @* <div class="ms-auto"> *@
+                 @*    <partial name="_LoginPartial" /> *@
+                 @* </div> *@
+
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            © 2025 - MvcBooks - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

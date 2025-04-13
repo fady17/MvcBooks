@@ -1,0 +1,155 @@
+@model MvcBooks.Models.ViewModels.BookViewModel
+
+@{
+    ViewData["Title"] = "Add New Book";
+}
+
+<h1>Add New Book</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        @* --- Important: enctype is required for file uploads --- *@
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+
+            @* Display validation summary for model-level errors (like the custom EITHER/OR check) *@
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            @* --- Basic Book Details --- *@
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Author" class="form-label"></label>
+                <input asp-for="Author" class="form-control" />
+                <span asp-validation-for="Author" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PublishedDate" class="form-label"></label>
+                <input asp-for="PublishedDate" type="date" class="form-control" /> @* Use type="date" for better UX *@
+                <span asp-validation-for="PublishedDate" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="CoverImage" class="form-label"></label>
+                <input asp-for="CoverImage" type="file" accept="image/*" class="form-control" />
+                <span asp-validation-for="CoverImage" class="text-danger"></span>
+                <small class="form-text text-muted">Upload a cover image (optional).</small>
+            </div>
+
+            <hr />
+            @* --- EPUB Source Section (EITHER File OR URL) --- *@
+            <h5 class="mb-3">Book Content Source</h5>
+            <p class="text-muted"><small>Provide the book content by either uploading an EPUB file OR entering a URL to an existing EPUB.</small></p>
+
+            <div class="mb-3">
+                <label asp-for="EpubFile" class="form-label"></label>
+                <input asp-for="EpubFile" type="file" accept=".epub" class="form-control" />
+                <span asp-validation-for="EpubFile" class="text-danger"></span>
+                <small class="form-text text-muted">Select an EPUB file from your computer.</small>
+            </div>
+
+            <div class="text-center my-2 fw-bold">OR</div>
+
+            <div class="mb-3">
+                <label asp-for="BookUrl" class="form-label"></label>
+                <input asp-for="BookUrl" type="url" class="form-control" placeholder="https://example.com/path/to/book.epub" />
+                <span asp-validation-for="BookUrl" class="text-danger"></span>
+                <small class="form-text text-muted">Enter a direct URL to an EPUB file hosted elsewhere.</small>
+            </div>
+             @* --- End EPUB Source Section --- *@
+            <hr />
+
+            @* --- Category Selection --- *@
+            <div class="mb-3">
+                <label class="form-label">Categories</label>
+                 @if (Model.AvailableCategories == null || !Model.AvailableCategories.Any())
+                {
+                     <div class="alert alert-warning">No categories found. Please add categories first.</div>
+                }
+                else
+                {
+                    <div class="row checkbox-list"> @* Added class for potential styling *@
+                        @foreach (var category in Model.AvailableCategories.OrderBy(c => c.Name)) @* Order for consistency *@
+                        {
+                            <div class="col-md-4 col-sm-6 mb-2">
+                                <div class="form-check">
+                                    <input type="checkbox"
+                                           name="SelectedCategoryIds" @* Must match ViewModel property name *@
+                                           value="@category.Id"
+                                           id="category_@category.Id"
+                                           class="form-check-input"
+                                           @(Model.SelectedCategoryIds?.Contains(category.Id) ?? false ? "checked" : "") /> @* Handle pre-selection if needed on redisplay *@
+                                    <label class="form-check-label" for="category_@category.Id">@category.Name</label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                     <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span> @* Add validation message if needed (e.g., require at least one) *@
+                }
+            </div>
+             @* --- End Category Selection --- *@
+
+
+            @* --- Submit Button --- *@
+            <div class="form-group mt-4 mb-3"> @* Consistent spacing *@
+                <button type="submit" class="btn btn-primary">Create Book</button>
+                <a asp-action="Index" class="btn btn-outline-secondary ms-2">Back to List</a>
+            </div>
+        </form>
+    </div>
+
+    @* Optional: Add a side column for instructions or tips *@
+    @* <div class="col-md-4">
+        <div class="alert alert-info">
+             <h5 class="alert-heading">Tips</h5>
+             <p>Please provide either an EPUB file upload or a valid URL.</p>
+             <p>Ensure the cover image is clear.</p>
+        </div>
+    </div> *@
+</div>
+
+@* --- Validation Scripts --- *@
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    @* Optional: Add client-side script to visually disable one source input if the other has value?
+       (Server-side validation is still the primary check)
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const epubFileInput = document.getElementById('@Html.IdFor(m => m.EpubFile)');
+            const bookUrlInput = document.getElementById('@Html.IdFor(m => m.BookUrl)');
+
+            epubFileInput.addEventListener('change', function () {
+                if (this.files.length > 0) {
+                    // Optionally disable or clear URL input
+                    // bookUrlInput.disabled = true;
+                    // bookUrlInput.value = '';
+                } else {
+                    // bookUrlInput.disabled = false;
+                }
+            });
+
+            bookUrlInput.addEventListener('input', function () {
+                if (this.value.trim() !== '') {
+                    // Optionally disable or clear file input
+                    // epubFileInput.disabled = true;
+                    // epubFileInput.value = null; // Clear file selection
+                } else {
+                    // epubFileInput.disabled = false;
+                }
+            });
+        });
+    </script>
+    *@
+}

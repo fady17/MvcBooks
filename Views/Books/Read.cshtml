@@ -1,0 +1,354 @@
+@model MvcBooks.Models.Book
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Read - " + Model.Title;
+    // Consider a minimal layout for distraction-free reading
+    // Layout = "_ReaderLayout"; // Example: Create a layout with minimal header/footer
+    Layout = "_Layout"; // Using the default layout for now
+}
+
+@section Styles {
+    <style>
+        /* --- START: Styles Aimed at Replicating epubjs-reader Layout --- */
+
+        /* Reset/Normalize specific to reader view - Prevent _Layout interference */
+        html, body {
+            overflow: hidden !important; /* Prevent body scrollbars */
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+         /* Make the direct container full viewport if possible */
+         /* Adjust the calc value based on your actual _Layout header/footer size */
+         main[role="main"] {
+             /* !!! IMPORTANT: Adjust 56px (navbar) and 60px (footer) to match YOUR layout's heights !!! */
+             height: calc(100vh - 56px - 60px); /* Example: Viewport - Navbar Height - Footer Height */
+             padding: 0 !important; /* Override layout padding */
+             margin: 0 !important; /* Override layout margin */
+             position: relative; /* Needed for absolute positioning inside */
+         }
+         /* Ensure .container within main also takes full height */
+         .container {
+             max-width: 100% !important;
+             height: 100%;
+             padding: 0 !important;
+         }
+
+        /* Mimic epubjs-reader structure */
+        #reader-main-area { /* New wrapper div */
+            position: relative; /* Important for arrows and viewer */
+            overflow: hidden;
+            height: 100%; /* Take full height of the container (main) */
+            background-color: #eee; /* Optional: Light grey background like some readers */
+        }
+
+        /* The Viewer Area - CRITICAL FOR SIZE */
+        #epub-viewer {
+            position: absolute;
+            top: 5px;     /* Minimal padding top */
+            left: 55px;   /* Make space for left arrow + padding */
+            right: 55px;  /* Make space for right arrow + padding */
+            bottom: 50px; /* Make space for controls */
+            background-color: white;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+            overflow: hidden; /* Let epub.js handle internal scroll/pagination */
+        }
+
+        /* Arrows - Position them absolutely relative to #reader-main-area */
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%); /* Better vertical centering */
+            font-size: 48px; /* Slightly smaller */
+            color: #a0a0a0;
+            font-family: sans-serif;
+            cursor: pointer;
+            user-select: none;
+            padding: 0 15px; /* Click area */
+            z-index: 10;
+            height: 60px; /* Ensure clickable height */
+            line-height: 60px;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+        }
+        .arrow:hover {
+            color: #000;
+        }
+        .arrow:active {
+            color: #555;
+        }
+
+        #prev {
+            left: 0;
+        }
+
+        #next {
+            right: 0;
+        }
+
+        /* Loading Message */
+        .loading-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.1rem;
+            color: #333;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px 30px;
+            border-radius: 8px;
+            z-index: 20;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Controls - Positioned absolutely at the bottom */
+        .reader-controls {
+             position: absolute; /* Position relative to reader-main-area */
+             bottom: 0;
+             left: 0;
+             width: 100%;
+             background-color: rgba(248, 249, 250, 0.95); /* Slightly less transparent */
+             padding: 8px 15px; /* Slightly smaller padding */
+             display: flex;
+             justify-content: center;
+             align-items: center;
+             z-index: 15; /* Below loading message, above viewer slightly */
+             border-top: 1px solid #ccc;
+             box-shadow: 0 -1px 3px rgba(0,0,0,0.05);
+        }
+        .reader-controls button {
+            margin: 0 15px;
+        }
+         .reader-controls span {
+            font-weight: 500;
+            min-width: 80px;
+            text-align: center;
+            color: #555;
+        }
+
+        /* --- END: Styles Aimed at Replicating epubjs-reader Layout --- */
+    </style>
+}
+
+@* --- MODIFIED HTML STRUCTURE --- *@
+<div id="reader-main-area">
+
+    <div id="prev" class="arrow" title="Previous Page">‹</div>
+
+    @* Viewer div where EPUB.js renders the content *@
+    <div id="epub-viewer"></div>
+
+    <div id="next" class="arrow" title="Next Page">›</div>
+
+    @* Loading indicator overlay *@
+    <div class="loading-message">
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Loading book, please wait...
+    </div>
+
+    @* Navigation controls area (positioned absolutely by CSS) *@
+    <div class="reader-controls">
+        <button id="prev-btn" class="btn btn-outline-secondary btn-sm" title="Previous Page (Left Arrow)">
+            <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <span id="current-page" class="mx-3 text-muted">Page ? of ?</span>
+        <button id="next-btn" class="btn btn-outline-secondary btn-sm" title="Next Page (Right Arrow)">
+             Next <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+</div>
+@* --- END MODIFIED HTML STRUCTURE --- *@
+
+
+@section Scripts {
+    <!-- Include Locally Hosted EPUBjs library -->
+    @* !!! IMPORTANT: Make sure these filenames match EXACTLY what you have in wwwroot/lib/epubjs/ !!! *@
+    <script src="~/lib/epubjs/jszip.js"></script>
+    <script src="~/lib/epubjs/epub.js"></script>
+    <!-- Optional: Font Awesome for icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+
+            // --- Find DOM Elements ---
+            const viewerElement = document.getElementById('epub-viewer');
+            const loadingMessageElement = document.querySelector('.loading-message'); // Find the element
+            const prevButton = document.getElementById('prev-btn');       // Control button
+            const nextButton = document.getElementById('next-btn');       // Control button
+            const prevArrow = document.getElementById('prev');             // Arrow element
+            const nextArrow = document.getElementById('next');             // Arrow element
+            const currentPageSpan = document.getElementById('current-page');
+
+             // --- CRITICAL CHECK for Loading Message ---
+             if (!loadingMessageElement) {
+                 console.error("Could not find the loading message element with class '.loading-message'!");
+                 alert("Error: UI element missing. Cannot initialize reader.");
+                 return; // Stop execution
+             }
+
+            // --- Check if Libraries Loaded ---
+            if (typeof ePub === 'undefined' || typeof JSZip === 'undefined') {
+                console.error("EPUBjs or JSZip library not loaded correctly!");
+                loadingMessageElement.textContent = // Safe to access .textContent
+                    "Error: Reader library failed to load. Please check file paths or browser console.";
+                return;
+            }
+
+            // Declare variables in the outer scope to be accessible later
+            let book;
+            let rendition;
+
+            // --- Determine the source URL or ArrayBuffer ---
+            const externalBookUrl = @Html.Raw(Json.Serialize(Model.BookUrl));
+            const internalEpubUrl = '@Url.Action("GetEpub", "Books", new { id = Model.Id })';
+            let epubDataSource = null;
+
+            loadingMessageElement.style.display = 'block'; // Show loading (safe now)
+
+            try {
+                // Determine the data source
+                if (externalBookUrl && externalBookUrl.trim() !== '') {
+                    console.log("Using external URL:", externalBookUrl);
+                    epubDataSource = externalBookUrl; // Use URL string directly
+                } else {
+                    console.log("Fetching EPUB data from internal path:", internalEpubUrl);
+                    const response = await fetch(internalEpubUrl);
+                    if (!response.ok) {
+                        // Provide more specific error info if possible
+                        const errorText = await response.text().catch(() => 'Could not read error response.');
+                        throw new Error(`Failed to fetch EPUB: ${response.status} ${response.statusText}. Server response: ${errorText}`);
+                    }
+                    epubDataSource = await response.arrayBuffer(); // Use ArrayBuffer
+                    console.log("EPUB data fetched as ArrayBuffer, size:", epubDataSource.byteLength);
+                    if (epubDataSource.byteLength < 50) { // Very small size might indicate an issue
+                        console.warn("Warning: Fetched EPUB data size is very small.");
+                    }
+                }
+
+                if (!epubDataSource) {
+                     throw new Error("Could not determine or fetch EPUB data source.");
+                }
+
+                // --- Initialize EPUB.js ---
+                console.log("Initializing ePub with source...");
+                book = ePub(epubDataSource); // Assign to the book variable declared outside try
+
+                console.log("Rendering book to viewer...");
+                rendition = book.renderTo(viewerElement, { // Assign to rendition variable
+                    width: "100%", // Rendition should fill the container
+                    height: "100%",
+                    flow: "paginated",
+                    spread: "auto", // Use 'none' if double-page spread causes issues
+                    manager: "continuous" // Use 'default' if continuous causes issues
+                });
+
+                console.log("Displaying rendition...");
+                rendition.display(); // Start rendering the first page
+
+                // --- Wait for book ready and generate locations ---
+                console.log("Waiting for book.ready...");
+                await book.ready; // Wait for core book processing
+                console.log("EPUBjs book is ready.");
+
+
+                console.log("Generating locations...");
+                // Locations might take time, keep loading hidden or show different message?
+                await book.locations.generate(1024); // Generate pagination points
+                console.log("Locations generated:", book.locations.total + " locations found.");
+
+                loadingMessageElement.style.display = 'none'; // Hide loading message AFTER locations are ready
+
+
+                // --- Set up Event Listeners and Initial State ---
+                updatePageDisplay(rendition.currentLocation()); // Update display for initial location
+
+                // Add listeners to both arrows and buttons
+                prevButton.addEventListener("click", () => { if (rendition) rendition.prev(); });
+                nextButton.addEventListener("click", () => { if (rendition) rendition.next(); });
+                prevArrow.addEventListener("click", () => { if (rendition) rendition.prev(); });
+                nextArrow.addEventListener("click", () => { if (rendition) rendition.next(); });
+
+                // Update page number display on navigation
+                rendition.on("relocated", (location) => {
+                    updatePageDisplay(location);
+                });
+
+                // Handle keyboard navigation
+                rendition.on("keyup", handleKeyPress);
+                viewerElement.addEventListener("keydown", handleKeyPress); // Also listen on viewer
+
+                // Allow viewer to receive focus for keyboard events
+                viewerElement.setAttribute('tabindex', '-1');
+                viewerElement.style.outline = 'none';
+                viewerElement.addEventListener("click", () => {
+                    viewerElement.focus();
+                });
+
+            } catch (err) { // Catch errors during fetch or initialization
+                 console.error("Error during EPUBjs initialization or processing:", err);
+                 if (loadingMessageElement) {
+                    loadingMessageElement.innerHTML = `<strong>Error loading book:</strong><br><small>${err.message || 'Unknown error'}</small>`; // Use innerHTML for line break
+                    loadingMessageElement.style.display = 'block'; // Show error
+                 } else {
+                    alert(`Error loading book: ${err.message || 'Unknown error'}`); // Fallback alert
+                 }
+            }
+
+
+            // --- Helper Functions (defined outside try/catch, use outer scope book/rendition) ---
+
+            function handleKeyPress(e) {
+                // Only navigate if rendition exists and target isn't an input field
+                if (!rendition || (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) {
+                    return;
+                }
+                 if (e.key === "ArrowLeft") {
+                     rendition.prev();
+                     e.preventDefault(); // Prevent browser scrolling/history
+                 }
+                 if (e.key === "ArrowRight") {
+                     rendition.next();
+                     e.preventDefault(); // Prevent browser scrolling
+                 }
+             }
+
+            function updatePageDisplay(location) {
+                 // Check if book, locations, and span exist
+                 if (!currentPageSpan || !book || !book.locations || !book.locations.total || book.locations.total === 0) {
+                    if(currentPageSpan) currentPageSpan.textContent = "Page ?";
+                     return;
+                 }
+                 if (!location || !location.start || !location.start.cfi) {
+                      // Use displayed page as fallback if CFI isn't ready/available yet
+                      if(location && location.start && location.start.displayed && location.start.displayed.page && book.locations.total){
+                          currentPageSpan.textContent = `Page ${location.start.displayed.page} of ${book.locations.total}`;
+                      } else {
+                          console.warn("UpdatePageDisplay couldn't get CFI or fallback page number.");
+                          currentPageSpan.textContent = "Page ?";
+                      }
+                     return;
+                 }
+
+                const currentPage = book.locations.locationFromCfi(location.start.cfi);
+                const totalPages = book.locations.total;
+
+                // Ensure we got valid numbers before displaying
+                if (currentPage && totalPages) {
+                     currentPageSpan.textContent = `Page ${currentPage} of ${totalPages}`;
+                } else {
+                     // Fallback if CFI lookup fails but we have displayed page numbers
+                     if(location.start.displayed.page && totalPages) {
+                        currentPageSpan.textContent = `Page ${location.start.displayed.page} of ${totalPages}`;
+                     } else {
+                        currentPageSpan.textContent = "Page ?";
+                     }
+                }
+            }
+
+        }); // End DOMContentLoaded
+    </script>
+}

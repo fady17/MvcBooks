@@ -1,0 +1,164 @@
+@model MvcBooks.Models.ViewModels.BookViewModel
+
+@{
+    ViewData["Title"] = "Edit Book - " + Model.Title;
+}
+
+<h1>Edit Book</h1>
+<h4>@Model.Title</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-8">
+        @* --- Edit Form --- *@
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+
+            @* Display validation summary for model-level errors *@
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            @* --- IMPORTANT: Include the hidden ID field --- *@
+            <input type="hidden" asp-for="Id" />
+             @* Also include existing paths/names so controller knows original state if needed, though ViewModel should hold this *@
+            <input type="hidden" asp-for="ExistingCoverUrl" />
+            <input type="hidden" asp-for="ExistingEpubFileName" />
+             <input type="hidden" asp-for="ExistingBookUrl" />
+
+
+            @* --- Basic Book Details --- *@
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label"></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Author" class="form-label"></label>
+                <input asp-for="Author" class="form-control" />
+                <span asp-validation-for="Author" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PublishedDate" class="form-label"></label>
+                <input asp-for="PublishedDate" type="date" class="form-control" />
+                <span asp-validation-for="PublishedDate" class="text-danger"></span>
+            </div>
+
+            <hr />
+            @* --- Cover Image --- *@
+            <h5 class="mb-3">Cover Image</h5>
+             @if (!string.IsNullOrEmpty(Model.ExistingCoverUrl))
+             {
+                 <div class="mb-2">
+                     <label class="form-label">Current Cover:</label><br />
+                     <img src="@Model.ExistingCoverUrl" alt="Current Cover" class="img-thumbnail" style="max-height: 150px;" />
+                 </div>
+             }
+            <div class="mb-3">
+                <label asp-for="CoverImage" class="form-label">Upload New Cover (Optional)</label>
+                <input asp-for="CoverImage" type="file" accept="image/*" class="form-control" />
+                <span asp-validation-for="CoverImage" class="text-danger"></span>
+                <small class="form-text text-muted">Select a new image file to replace the existing cover.</small>
+            </div>
+
+            <hr />
+            @* --- EPUB Source Section (EITHER File OR URL) --- *@
+            <h5 class="mb-3">Book Content Source</h5>
+            <p class="text-muted"><small>You can optionally provide a new EPUB file or URL below to replace the current source. If you leave both empty, the existing source will be kept.</small></p>
+
+            @if (!string.IsNullOrEmpty(Model.ExistingEpubFileName))
+            {
+                <div class="mb-2">
+                     <label class="form-label">Current Source:</label>
+                     <span class="badge bg-success"><i class="fas fa-file-upload me-1"></i> Uploaded File: @Model.ExistingEpubFileName</span>
+                 </div>
+            }
+            else if(!string.IsNullOrEmpty(Model.ExistingBookUrl))
+            {
+                 <div class="mb-2">
+                     <label class="form-label">Current Source:</label>
+                     <span class="badge bg-primary"><i class="fas fa-link me-1"></i> URL: @Model.ExistingBookUrl</span>
+                 </div>
+            }
+            else
+            {
+                 <div class="mb-2 alert alert-warning py-1">No current content source found. Please provide one below.</div>
+            }
+
+
+            <div class="mb-3">
+                <label asp-for="EpubFile" class="form-label">Upload New EPUB File (Optional)</label>
+                <input asp-for="EpubFile" type="file" accept=".epub" class="form-control" />
+                <span asp-validation-for="EpubFile" class="text-danger"></span>
+                <small class="form-text text-muted">Select a new EPUB file to replace the current source.</small>
+            </div>
+
+            <div class="text-center my-2 fw-bold">OR</div>
+
+            <div class="mb-3">
+                <label asp-for="BookUrl" class="form-label">Enter New Book URL (Optional)</label>
+                <input asp-for="BookUrl" type="url" class="form-control" placeholder="https://example.com/path/to/book.epub" />
+                <span asp-validation-for="BookUrl" class="text-danger"></span>
+                <small class="form-text text-muted">Enter a new URL to replace the current source.</small>
+            </div>
+             @* --- End EPUB Source Section --- *@
+            <hr />
+
+            @* --- Category Selection --- *@
+            <div class="mb-3">
+                <label class="form-label">Categories</label>
+                 @if (Model.AvailableCategories == null || !Model.AvailableCategories.Any())
+                {
+                     <div class="alert alert-warning">No categories found.</div>
+                }
+                else
+                {
+                    <div class="row checkbox-list">
+                        @foreach (var category in Model.AvailableCategories.OrderBy(c => c.Name))
+                        {
+                            <div class="col-md-4 col-sm-6 mb-2">
+                                <div class="form-check">
+                                    <input type="checkbox"
+                                           name="SelectedCategoryIds" @* Must match ViewModel property name *@
+                                           value="@category.Id"
+                                           id="category_@category.Id"
+                                           class="form-check-input"
+                                           @(Model.SelectedCategoryIds?.Contains(category.Id) ?? false ? "checked" : "") /> @* Pre-select based on model *@
+                                    <label class="form-check-label" for="category_@category.Id">@category.Name</label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                     <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
+                }
+            </div>
+             @* --- End Category Selection --- *@
+
+
+            @* --- Submit Button --- *@
+            <div class="form-group mt-4 mb-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Save Changes
+                </button>
+                <a asp-action="Index" class="btn btn-outline-secondary ms-2">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+
+    @* Optional: Add a side column *@
+    @* <div class="col-md-4"> ... </div> *@
+</div>
+
+@* --- Validation Scripts --- *@
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @* Include Font Awesome if needed *@
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+}

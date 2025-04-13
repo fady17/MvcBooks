@@ -1,0 +1,121 @@
+@model MvcBooks.Models.Book
+
+@{
+    ViewData["Title"] = Model.Title; // Set the page title to the book's title
+}
+
+<h2>Book Details</h2>
+<hr />
+
+<div class="row">
+    @* Column for Cover Image *@
+    <div class="col-md-4 mb-3 text-center">
+        <img src="@(string.IsNullOrEmpty(Model.CoverImageUrl) ? "/images/placeholder-cover.png" : Model.CoverImageUrl)"
+             alt="Cover for @Model.Title"
+             class="img-fluid rounded shadow-sm" @* Fluid, rounded corners, subtle shadow *@
+             style="max-height: 500px;"
+             onerror="this.onerror=null; this.src='/images/placeholder-cover.png';" />
+
+        @* --- Read Button --- *@
+        <div class="mt-3 d-grid"> @* Use d-grid for full-width button potential *@
+            @if (!string.IsNullOrEmpty(Model.EpubFilePath) || !string.IsNullOrEmpty(Model.BookUrl))
+            {
+                <a asp-action="Read" asp-route-id="@Model.Id" class="btn btn-success btn-lg">
+                    <i class="fas fa-book-open"></i> Read Book
+                </a>
+            }
+            else
+            {
+                 <button type="button" class="btn btn-secondary btn-lg disabled" aria-disabled="true">
+                    <i class="fas fa-times-circle"></i> No Readable Content
+                 </button>
+                 <small class="text-muted mt-1">No EPUB file or valid URL available.</small>
+            }
+        </div>
+    </div>
+
+    @* Column for Book Information *@
+    <div class="col-md-8 mb-3">
+        <h3>@Html.DisplayFor(model => model.Title)</h3>
+        @if (!string.IsNullOrWhiteSpace(Model.Author))
+        {
+            <h5 class="text-muted mb-3">by @Html.DisplayFor(model => model.Author)</h5>
+        }
+
+        <dl class="row dl-horizontal"> @* Use definition list for key-value pairs *@
+            <dt class="col-sm-3">Description</dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    @Html.DisplayFor(model => model.Description)
+                }
+                else
+                {
+                    <span class="text-muted fst-italic">No description provided.</span>
+                }
+            </dd>
+
+            <dt class="col-sm-3">Published Date</dt>
+            <dd class="col-sm-9">@Model.PublishedDate.ToString("yyyy-MM-dd")</dd> @* Format the date *@
+
+            <dt class="col-sm-3">Categories</dt>
+            <dd class="col-sm-9">
+                @if (Model.Categories != null && Model.Categories.Any())
+                {
+                    foreach (var category in Model.Categories)
+                    {
+                        <span class="badge bg-info me-1">@category.Name</span>
+                    }
+                }
+                else
+                {
+                    <span class="text-muted">None</span>
+                }
+            </dd>
+
+             <dt class="col-sm-3">Source</dt>
+             <dd class="col-sm-9">
+                 @if (!string.IsNullOrEmpty(Model.EpubFilePath))
+                 {
+                     <span>Uploaded File: @(Model.EpubFileName ?? "EPUB File")</span>
+                     <a asp-action="GetEpub" asp-route-id="@Model.Id" class="ms-2 small" title="Download EPUB"><i class="fas fa-download"></i> Download</a>
+                 }
+                 else if (!string.IsNullOrEmpty(Model.BookUrl))
+                 {
+                     <span>External URL: <a href="@Model.BookUrl" target="_blank" rel="noopener noreferrer">@Model.BookUrl</a></span>
+                 }
+                 else
+                 {
+                     <span class="text-muted">N/A</span>
+                 }
+             </dd>
+
+            <dt class="col-sm-3">Added By</dt>
+            <dd class="col-sm-9">@(Model.User?.UserName ?? "N/A")</dd> @* Requires User to be Included *@
+
+            @* Add other fields if needed *@
+
+        </dl>
+
+         @* --- Action Links --- *@
+        <div class="mt-4">
+             @* Show Edit/Delete links - Controller handles actual authorization *@
+             <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-secondary">
+                 <i class="fas fa-edit"></i> Edit
+             </a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger ms-2">
+                <i class="fas fa-trash-alt"></i> Delete
+            </a>
+            <a asp-action="Index" class="btn btn-outline-secondary ms-2">
+                <i class="fas fa-list"></i> Back to List
+            </a>
+        </div>
+
+    </div>
+</div>
+
+
+@* Include Font Awesome if you want icons *@
+@section Scripts {
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+}

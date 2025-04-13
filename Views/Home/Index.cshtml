@@ -1,0 +1,58 @@
+﻿@model List<MvcBooks.Models.Category>
+
+@{
+    ViewData["Title"] = "Library Home";
+}
+
+@* --- Hero Billboard Section --- *@
+<div class="hero-billboard mb-4"> @* Added margin-bottom for spacing *@
+    <div class="hero-content text-center">
+        @* <h1 class="display-5 fw-bold hero-title">Explore Books, For Free!</h1>
+        <p class="fs-5 hero-subtitle">Browse thousands of books across every genre,available here.</p> *@
+        @* Optional: Add a button later if needed
+        <a href="#" class="btn btn-primary btn-lg hero-button">Start Reading</a>
+        *@
+    </div>
+</div>
+@* --- End Hero Billboard Section --- *@
+
+
+<div class="library-home">
+    @if (!Model.Any())
+    {
+        <div class="text-center">
+            <p>No categories found. Add some categories and books to get started!</p>
+        </div>
+    }
+    else
+    {
+        @foreach (var category in Model)
+        {
+            // Only display categories that have books
+            if (category.Books != null && category.Books.Any())
+            {
+                <div class="category-row mb-5"> @* Keep spacing below categories *@
+                    <h2 class="category-title">@category.Name</h2>
+                    <div class="book-list-wrapper">
+                        <div class="book-list">
+                            @foreach (var book in category.Books.Take(10))
+                            {
+                                <div class="book-item">
+                                    <a asp-controller="Books" asp-action="Details" asp-route-id="@book.Id" title="@book.Title">
+                                        <img src="@(string.IsNullOrEmpty(book.CoverImageUrl) ? "/images/placeholder-cover.png" : book.CoverImageUrl)"
+                                             alt="Cover for @book.Title"
+                                             class="book-cover img-fluid"
+                                             onerror="this.onerror=null; this.src='/images/placeholder-cover.png';" />
+                                        @* <p class="book-title-sm">@book.Title</p> *@
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+</div>
+
+@* Add a placeholder image in wwwroot/images/placeholder-cover.png *@

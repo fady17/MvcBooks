@@ -1,0 +1,340 @@
+/* --- Theme Color Variables (Low Contrast, Light, Eye-Relieving) --- */
+:root {
+  /* Base */
+  --theme-background-base: #f8f9fa; /* Off-white (Bootstrap's gray-100) */
+  --theme-text-base: #495057; /* Dark gray (Bootstrap's gray-700) - Good contrast on off-white */
+  --theme-text-muted: #6c757d; /* Muted gray (Bootstrap's gray-600) */
+  --theme-card-background: #ffffff; /* Keep cards white for subtle separation */
+
+  /* Soft Blue & Green Accents */
+  --theme-primary-blue-soft: #6c94b8; /* Desaturated, softer blue */
+  --theme-secondary-green-soft: #77ab91; /* Softer, slightly muted green */
+
+  /* Links */
+  --theme-link-color: #376ea0; /* A blue that has enough contrast on the background */
+  --theme-link-hover: #2a547a; /* Darker version for hover */
+
+  /* Navbar */
+  --theme-navbar-bg: var(--theme-secondary-green-soft); 
+  --theme-navbar-text: #ffffff; 
+
+  /* Hero Overlay - Use softer versions */
+  --theme-hero-blue-rgba: rgba(108, 148, 184, 0.70); 
+  --theme-hero-green-rgba: rgba(119, 171, 145, 0.70); 
+  --theme-card-background: #ffffff; 
+  --theme-border-color: #dee2e6;
+
+  --theme-primary-accent: var(--theme-primary-blue-soft); /* Alias for consistency if preferred */
+  --theme-secondary-accent: var(--theme-secondary-green-soft); /* Alias for consistency */
+  --rgb-primary-accent: 108, 148, 184;
+}
+
+/* --- General Body Styling --- */
+html {
+font-size: 14px;
+}
+
+@media (min-width: 768px) {
+html {
+  font-size: 16px;
+}
+}
+
+html {
+position: relative;
+min-height: 100%;
+}
+
+body {
+margin-bottom: 60px;
+background-color: var(--theme-background-base); /* Use the new base background */
+color: var(--theme-text-base); /* Use the new base text color */
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* Common system font stack */
+}
+
+/* --- Links --- */
+a {
+  color: var(--theme-link-color);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--theme-link-hover);
+  text-decoration: underline;
+}
+
+/* --- Headings --- */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--theme-primary-blue-soft); /* Use soft blue for headings */
+}
+
+/* --- Custom Navigation Bar --- */
+.custom-navbar {
+  background-color: var(--theme-navbar-bg); /* Use variable for navbar bg */
+  border: none;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* Very subtle shadow */
+}
+
+.navbar-brand {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-right: auto;
+  margin-left: 0.5rem;
+}
+
+.navbar-logo {
+  height: 40px;
+  width: auto;
+  vertical-align: middle;
+}
+
+/* Optional: Styling for Text Logo */
+.navbar-logo-text {
+  color: var(--theme-navbar-text); /* Use navbar text color */
+  font-size: 1.5rem;
+  font-weight: bold;
+  vertical-align: middle;
+}
+
+
+/* --- Hero Billboard Section --- */
+.hero-billboard {
+  min-height: 30vh;
+  /* Updated gradient with new softer RGBA variables */
+  background: linear-gradient(135deg, var(--theme-hero-blue-rgba), var(--theme-hero-green-rgba)),
+              url('../images/hero-background.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  color: #ffffff; /* Keep text white for contrast on overlay */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.hero-content {
+  max-width: 700px;
+  background-color: rgba(0, 0, 0, 0.2); /* Keep subtle dark overlay for text readability */
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15); /* Slightly softer shadow */
+}
+
+.hero-title {
+  color: #ffffff;
+  font-weight: 700;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); /* Slightly softer text shadow */
+}
+
+.hero-subtitle {
+  color: #f0f0f0; /* Slightly off-white for subtitle */
+  opacity: 0.95;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4); /* Slightly softer text shadow */
+  margin-bottom: 0;
+}
+
+
+/* --- Library Home Page Specific Styles (Theme Applied) --- */
+.library-home {
+  padding-top: 20px;
+}
+
+.category-row {
+  margin-bottom: 3rem;
+}
+
+.category-title {
+  margin-bottom: 1.25rem;
+  font-size: 1.75rem;
+  font-weight: 600; /* Slightly less bold */
+  color: var(--theme-primary-blue-soft); /* Soft blue title */
+  border-bottom: 2px solid var(--theme-secondary-green-soft); /* Soft green border */
+  padding-bottom: 0.6rem;
+  display: inline-block;
+}
+
+.book-list-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  padding-bottom: 15px;
+  margin-bottom: -15px;
+}
+.book-list-wrapper::-webkit-scrollbar {
+  height: 8px; /* Thinner scrollbar */
+}
+.book-list-wrapper::-webkit-scrollbar-track {
+  background: #e9ecef; /* Lighter track (Bootstrap gray-200) */
+  border-radius: 10px;
+}
+.book-list-wrapper::-webkit-scrollbar-thumb {
+  background: var(--theme-secondary-green-soft); /* Soft green thumb */
+  border-radius: 10px;
+}
+.book-list-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #679a81; /* Slightly darker soft green on hover */
+}
+
+.book-item {
+  display: inline-block;
+  width: 160px;
+  vertical-align: top;
+  margin-right: 20px;
+  text-align: center;
+  white-space: normal;
+  background-color: var(--theme-card-background); /* Use card background variable */
+  border-radius: 4px;
+  overflow: hidden;
+  /* Softer shadow */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.book-item:last-child {
+  margin-right: 0;
+}
+
+.book-item a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.book-cover {
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+  border: none;
+  margin-bottom: 0;
+  display: block;
+}
+
+.book-item a:hover {
+  text-decoration: none;
+}
+
+.book-item:hover {
+  transform: translateY(-4px); /* Slightly less lift */
+  /* Softer hover shadow */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.09);
+}
+
+/* Optional: Title below cover */
+.book-title-sm {
+  font-size: 0.9rem;
+  padding: 10px 8px;
+  color: var(--theme-text-base); /* Use base text color */
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 3em;
+  line-height: 1.4em;
+}
+
+
+/* --- Footer --- */
+.footer {
+  background-color: #e9ecef; /* Lighter footer background (Bootstrap gray-200) */
+  color: var(--theme-text-muted); /* Muted text */
+  border-top: 1px solid #dee2e6; /* Lighter border (Bootstrap gray-300) */
+  padding: 1rem 0; /* Ensure padding */
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60px; /* Footer height */
+  line-height: 60px; /* Vertically center text */
+}
+.footer a {
+  color: var(--theme-text-muted);
+}
+.footer a:hover {
+  color: var(--theme-text-base); /* Use base text color on hover */
+}
+
+/* Adjust container padding if needed */
+.container {
+  max-width: 1140px;
+}
+
+/* Responsive adjustments for Hero */
+@media (max-width: 768px) {
+  .hero-billboard {
+      min-height: 35vh;
+      padding: 1.5rem 0.5rem;
+  }
+  .hero-content {
+      padding: 1rem;
+  }
+  .hero-title {
+      font-size: 2rem; /* Adjust if needed */
+  }
+  .hero-subtitle {
+      font-size: 1rem; /* Adjust if needed */
+  }
+}
+.auth-card {
+  background-color: var(--theme-card-background); /* Should be #ffffff */
+  border: 1px solid var(--theme-border-color); /* Add subtle border using theme color */
+  border-radius: 0.5rem;
+  /* Shadow from your existing book item style */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+}
+
+.auth-title {
+  color: var(--theme-primary-blue-soft); /* Main title color */
+  font-weight: 600;
+}
+
+.auth-card h2 {
+  color: var(--theme-text-muted); /* Muted text color */
+  font-size: 1.1rem; /* Make it slightly smaller than h1 */
+}
+
+.auth-card .form-floating > .form-control:focus {
+  border-color: var(--theme-primary-blue-soft); /* Focus border */
+  /* Use the defined RGB variable for the alpha shadow */
+  box-shadow: 0 0 0 0.25rem rgba(var(--rgb-primary-accent), 0.25);
+}
+
+/* Themed Buttons */
+.btn-themed-primary { /* Login Button */
+  background-color: var(--theme-primary-blue-soft);
+  border-color: var(--theme-primary-blue-soft);
+  color: #fff; /* White text should be okay on this blue */
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.btn-themed-primary:hover {
+  background-color: #5a81a3; /* Slightly darker blue */
+  border-color: #54799a;
+  color: #fff;
+}
+
+.btn-themed-secondary { /* Register Button */
+  background-color: var(--theme-secondary-green-soft);
+  border-color: var(--theme-secondary-green-soft);
+  color: #fff; /* White text should be okay on this green */
+  padding: 0.6rem 1.2rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-themed-secondary:hover {
+  background-color: #679a81; /* Slightly darker green */
+  border-color: #5f8f75;
+  color: #fff;
+}
+
+.auth-links a {
+  color: var(--theme-link-color); /* Standard link color */
+  text-decoration: none;
+}
+.auth-links a:hover {
+  color: var(--theme-link-hover); /* Standard link hover color */
+  text-decoration: underline;
+}
+

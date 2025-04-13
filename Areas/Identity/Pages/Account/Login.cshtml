@@ -1,0 +1,103 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Log In";
+    // Optional: Define a specific layout for Identity pages if needed
+    // Layout = "/Areas/Identity/Pages/_Layout.cshtml"; // Or "/Views/Shared/_Layout.cshtml"
+}
+
+<div class="container auth-container py-5"> @* Added container and padding *@
+    <div class="row justify-content-center align-items-center">
+
+        @* Optional Visual Column *@
+        <div class="col-lg-6 col-md-5 d-none d-md-block text-center pe-lg-5">
+            <img src="~/images/hero-background.jpg" alt="Library Login Visual" class="img-fluid rounded shadow-sm"
+                 onerror="this.style.display='none'" /> @* Hide if image fails to load *@
+        </div>
+
+        @* Form Column *@
+        <div class="col-lg-5 col-md-7 col-sm-10">
+            <div class="card shadow-sm auth-card"> @* Card container for the form *@
+                <div class="card-body p-4 p-md-5"> @* Added padding *@
+
+                    <h1 class="text-center auth-title mb-4">@ViewData["Title"]</h1>
+
+                    <section>
+                        <form id="account" method="post">
+                            <h2 class="text-center h5 mb-3 fw-normal">Use your local account</h2> @* Subtler heading *@
+                            <hr class="mb-4" />
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                                <label asp-for="Input.Email" class="form-label"></label>
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+                                <label asp-for="Input.Password" class="form-label"></label>
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="form-check"> @* Improved Checkbox Layout *@
+                                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                                    <label asp-for="Input.RememberMe" class="form-check-label">
+                                        @Html.DisplayNameFor(m => m.Input.RememberMe)
+                                    </label>
+                                </div>
+                                <a id="forgot-password" class="small" asp-page="./ForgotPassword">Forgot password?</a>
+                            </div>
+
+
+                            <div class="d-grid gap-2 mb-4"> @* Use grid for button sizing *@
+                                <button id="login-submit" type="submit" class="btn btn-themed-primary">Log in</button>
+                            </div>
+
+                            <div class="text-center small auth-links"> @* Centered links *@
+                                <p class="mb-1">
+                                    <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Create a new account</a>
+                                </p>
+                                @* Keep Resend Confirmation only if required/enabled *@
+                                @* <p>
+                                    <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
+                                </p> *@
+                            </div>
+                        </form>
+                    </section>
+
+                    @* --- External Logins (Optional Section) --- *@
+                    @{
+                        if ((Model.ExternalLogins?.Count ?? 0) > 0)
+                        {
+                            <hr class="my-4">
+                            <section class="text-center">
+                                <h3 class="h6 mb-3 fw-normal">Or log in using another service</h3>
+                                <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                                    <div>
+                                        @foreach (var provider in Model.ExternalLogins!)
+                                        {
+                                            <button type="submit" class="btn btn-outline-secondary btn-sm me-1 mb-1" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                                                @* Optional: Add provider icons here <i class="fab fa-google me-1"></i> *@
+                                                @provider.DisplayName
+                                            </button>
+                                        }
+                                    </div>
+                                </form>
+                            </section>
+                        }
+                    }
+                     @* --- End External Logins --- *@
+
+                </div> @* End Card Body *@
+            </div> @* End Card *@
+        </div> @* End Form Column *@
+    </div> @* End Row *@
+</div> @* End Container *@
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
