@@ -20,7 +20,7 @@
             @Html.DisplayNameFor(model => model.Author)
         </dt>
         <dd class="col-sm-10">
-            @(Model.Author ?? "N/A") @* Handle potential null author *@
+            @(Model.Author ?? "N/A")
         </dd>
         <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.PublishedDate)
@@ -45,25 +45,26 @@
                  <span class="text-muted">None</span>
              }
         </dd>
-        @* Add any other important fields you want the user to see for confirmation *@
+        @* Add other fields if needed *@
     </dl>
 
-    <form asp-action="Delete" method="post"> @* POSTs to the DeleteConfirmed action *@
-        @* --- IMPORTANT: Include the Id of the book to be deleted --- *@
+    <form asp-action="Delete" method="post">
         <input type="hidden" asp-for="Id" />
-
-        @* --- Anti-Forgery Token is automatically added by form tag helper --- *@
 
         <button type="submit" class="btn btn-danger">
             <i class="fas fa-trash-alt"></i> Yes, Delete Permanently
         </button>
-        <a asp-action="Index" class="btn btn-secondary ms-2">
+
+        @* --- START: Corrected Cancel Button --- *@
+        <a asp-area="Identity" asp-page="/Account/Manage/MyBooks" class="btn btn-outline-secondary ms-2">
              <i class="fas fa-times"></i> Cancel
         </a>
+        @* --- END: Corrected Cancel Button --- *@
     </form>
 </div>
 
-@* Include Font Awesome if you want icons *@
+@* Font Awesome CDN Link (ensure it's loaded, perhaps globally in _Layout) *@
 @section Scripts {
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+     @* <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script> *@
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 }

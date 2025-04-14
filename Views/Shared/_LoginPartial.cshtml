@@ -7,22 +7,51 @@
 <ul class="navbar-nav align-items-center">
 @if (SignInManager.IsSignedIn(User))
 {
-     <li class="nav-item me-2">
+    var currentUser = await UserManager.GetUserAsync(User); // Get the full User object
+    var profilePictureUrl = currentUser?.ProfilePictureUrl; // Get the picture URL (null if user not found or no picture)
+    var placeholderProfilePic = "/images/placeholder-profile.png"; // Define placeholder
+
+    <li class="nav-item me-2"> @* Add Book Button remains the same *@
          <a class="btn btn-sm btn-outline-light" asp-area="" asp-controller="Books" asp-action="Create" title="Add New Book">
              <i class="fas fa-plus"></i> Add Book
          </a>
     </li>
-    <li class="nav-item">
-        
-        <a id="manage" class="nav-link text-light" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
+    
+    @* --- START Profile Picture & Name --- *@
+    <li class="nav-item dropdown"> @* Using a dropdown for potential future links *@
+         <a class="nav-link dropdown-toggle text-light d-flex align-items-center" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+             
+             @* Profile Picture *@
+             <img src="@(profilePictureUrl ?? placeholderProfilePic)" 
+                  alt="Profile" 
+                  class="rounded-circle me-2" 
+                  style="width: 30px; height: 30px; object-fit: cover;"
+                  onerror="this.onerror=null; this.src='@placeholderProfilePic';" />
+             
+             @* User Name *@
+             @UserManager.GetUserName(User) 
+             
+         </a>
+         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownMenuLink"> @* Align dropdown to the right *@
+             <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage Profile"><i class="fas fa-user-cog me-2"></i>Manage Account</a></li>
+             <li><a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/MyBooks" title="Manage My Books"><i class="fas fa-book me-2"></i>My Books</a></li>
+             <li><hr class="dropdown-divider"></li>
+             <li>
+                  @* Logout Form inside dropdown item *@
+                  <form id="logoutForm" class="form-inline d-grid" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                      <button id="logout" type="submit" class="btn btn-link dropdown-item text-danger"><i class="fas fa-sign-out-alt me-2"></i>Logout</button>
+                  </form>
+             </li>
+         </ul>
     </li>
-    <li class="nav-item">
+     @* --- END Profile Picture & Name --- *@
+
+    @* Original Separate Logout (Removed in favor of dropdown) *@
+    @* <li class="nav-item">
         <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            
             <button id="logout" type="submit" class="nav-link btn btn-link text-light border-0">Logout</button>
-            
         </form>
-    </li>
+    </li> *@
 }
 else
 {
@@ -34,3 +63,9 @@ else
     </li>
 }
 </ul>
+
+@* --- Add link to Font Awesome if not already globally available --- *@
+@* Add this section if icons don't appear and it's not in _Layout *@
+@* @section Scripts { 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+} *@

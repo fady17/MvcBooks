@@ -36,6 +36,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9Mb2dvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/fady/Desktop/wdt/MvcBooks/Areas/Identity/Pages/Account/Manage/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/fady/Desktop/wdt/MvcBooks/Areas/Identity/Pages/Account/Manage/MyBooks.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvTXlCb29rcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/fady/Desktop/wdt/MvcBooks/Areas/Identity/Pages/Account/Manage/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9NYW5hZ2UvX0xheW91dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -84,10 +92,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va3MvRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/fady/Desktop/wdt/MvcBooks/Views/Books/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va3MvSW5kZXguY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
 [/Users/fady/Desktop/wdt/MvcBooks/Views/Books/Read.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va3MvUmVhZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -98,6 +102,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/Users/fady/Desktop/wdt/MvcBooks/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/fady/Desktop/wdt/MvcBooks/Views/Home/Search.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9TZWFyY2guY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/fady/Desktop/wdt/MvcBooks/Views/Shared/Error.cshtml]

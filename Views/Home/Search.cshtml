@@ -1,0 +1,62 @@
+@model MvcBooks.Models.ViewModels.SearchViewModel
+
+@{
+    ViewData["Title"] = $"Search Results for \"{Model.SearchTerm}\"";
+}
+
+<div class="container mt-4"> @* Add container and margin *@
+
+    @if (string.IsNullOrWhiteSpace(Model.SearchTerm))
+    {
+        <h1>Book Search</h1>
+        <p class="lead text-muted">Please enter a term in the search bar on the <a asp-action="Index">Home Page</a> to find books.</p>
+    }
+    else
+    {
+        <h1>Search Results</h1>
+        <p class="lead text-muted">Showing results for: <strong>"@Model.SearchTerm"</strong></p>
+        <hr />
+
+        @if (!Model.Results.Any())
+        {
+            <div class="alert alert-warning" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>No public books found matching your search term "@Model.SearchTerm".
+                Try searching for something else or <a asp-action="Index" class="alert-link">browse all books</a>.
+            </div>
+        }
+        else
+        {
+            @* Use the same card layout as the old Books/Index or Home page book items *@
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4">
+                @foreach (var item in Model.Results)
+                {
+                    <div class="col">
+                        <div class="book-item"> @* Reuse existing book-item style *@
+                            <a asp-controller="Books" asp-action="Details" asp-route-id="@item.Id" title="@item.Title">
+                                <img src="@(string.IsNullOrEmpty(item.CoverImageUrl) ? "/images/placeholder-cover.png" : item.CoverImageUrl)"
+                                     class="book-cover"
+                                     alt="Cover for @item.Title"
+                                     onerror="this.onerror=null; this.src='/images/placeholder-cover.png';" />
+                                <span class="book-title-sm">@item.Title</span>
+                                @* Optional: Add author here if desired *@
+                                @* <span class="book-author-sm text-muted small px-3 pb-2 d-block">@item.Author</span> *@
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+
+    <div class="mt-4">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Home
+        </a>
+    </div>
+
+</div>
+
+@* Add Font Awesome if not global *@
+@section Scripts {
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+}

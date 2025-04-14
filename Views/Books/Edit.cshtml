@@ -10,18 +10,14 @@
 
 <div class="row">
     <div class="col-md-8">
-        @* --- Edit Form --- *@
         <form asp-action="Edit" method="post" enctype="multipart/form-data">
 
-            @* Display validation summary for model-level errors *@
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-            @* --- IMPORTANT: Include the hidden ID field --- *@
             <input type="hidden" asp-for="Id" />
-             @* Also include existing paths/names so controller knows original state if needed, though ViewModel should hold this *@
             <input type="hidden" asp-for="ExistingCoverUrl" />
             <input type="hidden" asp-for="ExistingEpubFileName" />
-             <input type="hidden" asp-for="ExistingBookUrl" />
+            <input type="hidden" asp-for="ExistingBookUrl" />
 
 
             @* --- Basic Book Details --- *@
@@ -67,7 +63,7 @@
             </div>
 
             <hr />
-            @* --- EPUB Source Section (EITHER File OR URL) --- *@
+            @* --- EPUB Source Section --- *@
             <h5 class="mb-3">Book Content Source</h5>
             <p class="text-muted"><small>You can optionally provide a new EPUB file or URL below to replace the current source. If you leave both empty, the existing source will be kept.</small></p>
 
@@ -90,7 +86,6 @@
                  <div class="mb-2 alert alert-warning py-1">No current content source found. Please provide one below.</div>
             }
 
-
             <div class="mb-3">
                 <label asp-for="EpubFile" class="form-label">Upload New EPUB File (Optional)</label>
                 <input asp-for="EpubFile" type="file" accept=".epub" class="form-control" />
@@ -106,7 +101,6 @@
                 <span asp-validation-for="BookUrl" class="text-danger"></span>
                 <small class="form-text text-muted">Enter a new URL to replace the current source.</small>
             </div>
-             @* --- End EPUB Source Section --- *@
             <hr />
 
             @* --- Category Selection --- *@
@@ -124,11 +118,11 @@
                             <div class="col-md-4 col-sm-6 mb-2">
                                 <div class="form-check">
                                     <input type="checkbox"
-                                           name="SelectedCategoryIds" @* Must match ViewModel property name *@
+                                           name="SelectedCategoryIds" 
                                            value="@category.Id"
                                            id="category_@category.Id"
                                            class="form-check-input"
-                                           @(Model.SelectedCategoryIds?.Contains(category.Id) ?? false ? "checked" : "") /> @* Pre-select based on model *@
+                                           @(Model.SelectedCategoryIds?.Contains(category.Id) ?? false ? "checked" : "") /> 
                                     <label class="form-check-label" for="category_@category.Id">@category.Name</label>
                                 </div>
                             </div>
@@ -137,7 +131,18 @@
                      <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
                 }
             </div>
-             @* --- End Category Selection --- *@
+            <hr /> @* Added separator *@
+
+            @* --- START: Added IsPublic Checkbox --- *@
+            <div class="mb-3">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" asp-for="IsPublic">
+                    <label class="form-check-label" asp-for="IsPublic"></label>
+                 </div>
+                <small class="form-text text-muted">Check this box to make the book visible on the public home page. Uncheck to keep it private to your account.</small>
+                <span asp-validation-for="IsPublic" class="text-danger"></span>
+            </div>
+            @* --- END: Added IsPublic Checkbox --- *@
 
 
             @* --- Submit Button --- *@
@@ -145,20 +150,17 @@
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Save Changes
                 </button>
-                <a asp-action="Index" class="btn btn-outline-secondary ms-2">
-                    <i class="fas fa-times"></i> Cancel
-                </a>
+                 @* --- Link back to MyBooks page (adjust later if needed) --- *@
+                 <a asp-area="Identity" asp-page="/Account/Manage/MyBooks" class="btn btn-outline-secondary ms-2">Cancel</a> 
+                 @* --- Temporarily link back to Home until MyBooks exists --- *@
+                 @* <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary ms-2">Cancel</a> *@
             </div>
         </form>
     </div>
-
-    @* Optional: Add a side column *@
-    @* <div class="col-md-4"> ... </div> *@
 </div>
 
-@* --- Validation Scripts --- *@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    @* Include Font Awesome if needed *@
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    @* Font Awesome link might be needed if not global *@
+    @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" /> *@
 }

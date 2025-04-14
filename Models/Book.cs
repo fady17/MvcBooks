@@ -24,7 +24,7 @@ namespace MvcBooks.Models
         [StringLength(200)]
         public string? Author { get; set; }
         
-        // User who published/added the book 
+        
         public string? UserId { get; set; }
         
         [ForeignKey("UserId")]
@@ -33,19 +33,22 @@ namespace MvcBooks.Models
         // Direct many-to-many relationship
         public ICollection<Category> Categories { get; set; } = new List<Category>();
 
-        // Option 1: Locally Hosted EPUB File (Uploaded)
+        
 
-         [StringLength(255)] // Path to the stored EPUB file (e.g., /books/guid.epub)
+         [StringLength(255)] 
         public string? EpubFilePath { get; set; }
 
         [StringLength(100)] 
         public string? EpubFileName { get; set; }
 
-        // Option 2: External Book URL
+       
 
         [StringLength(2048)] 
         [Url] 
         [Display(Name = "Book Source URL")]
         public string? BookUrl { get; set; } 
+
+        [Display(Name = "Publicly Visible?")]
+        public bool IsPublic { get; set; } = true;
     }
 }

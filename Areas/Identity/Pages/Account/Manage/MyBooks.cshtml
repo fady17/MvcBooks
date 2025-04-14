@@ -1,0 +1,88 @@
+@page
+@model MyBooksModel 
+@{
+    ViewData["Title"] = "My Uploaded Books";
+    // Link this page to the ManageNavPages logic for active state
+    ViewData["ActivePage"] = ManageNavPages.MyBooks; 
+}
+
+<h4>@ViewData["Title"]</h4>
+
+@* Include the partial view for status messages *@
+<partial name="_StatusMessage" model="Model.StatusMessage" />
+
+<div class="row">
+    <div class="col-md-12">
+        @if (!Model.UserBooks.Any())
+        {
+            <div class="alert alert-info mt-3" role="alert">
+                You haven't uploaded any books yet. 
+                <a asp-controller="Books" asp-action="Create" class="alert-link">Add your first book!</a>
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped table-hover mt-3">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 80px;">Cover</th>
+                        <th>Title</th>
+                        <th class="d-none d-md-table-cell">Author</th> @* Hide on smaller screens *@
+                        <th class="text-center">Public?</th>
+                        <th style="width: 180px;">Actions</th> @* Adjust width as needed *@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.UserBooks)
+                    {
+                        <tr>
+                            <td class="text-center align-middle">
+                                <img src="@(string.IsNullOrEmpty(item.CoverImageUrl) ? "/images/placeholder-cover.png" : item.CoverImageUrl)"
+                                     alt="Cover for @item.Title"
+                                     style="max-height: 50px; width: auto;"
+                                     class="img-thumbnail"
+                                     onerror="this.onerror=null; this.src='/images/placeholder-cover.png';" />
+                            </td>
+                            <td class="align-middle">
+                                @Html.DisplayFor(modelItem => item.Title)
+                            </td>
+                            <td class="align-middle d-none d-md-table-cell"> @* Hide on smaller screens *@
+                                @(item.Author ?? "N/A")
+                            </td>
+                            <td class="align-middle text-center">
+                                @if(item.IsPublic)
+                                {
+                                    <span class="badge bg-success" title="Visible on Home Page"><i class="fas fa-check"></i> Yes</span>
+                                }
+                                else
+                                {
+                                     <span class="badge bg-secondary" title="Private to your account"><i class="fas fa-lock"></i> No</span>
+                                }
+                            </td>
+                            <td class="align-middle text-center">
+                                <div class="btn-group" role="group" aria-label="Book Actions">
+                                     @* Links point back to the existing BooksController actions *@
+                                     <a asp-controller="Books" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm" title="View Details">
+                                        <i class="fas fa-info-circle"></i>
+                                     </a>
+                                     <a asp-controller="Books" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm" title="Edit Book">
+                                        <i class="fas fa-edit"></i>
+                                     </a>
+                                     <a asp-controller="Books" asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" title="Delete Book">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@* --- Add link to Font Awesome if not already globally available --- *@
+@section Scripts {
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <partial name="_ValidationScriptsPartial" /> @* Keep validation scripts if needed in future *@
+}

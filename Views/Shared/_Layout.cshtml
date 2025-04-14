@@ -7,32 +7,40 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/MvcBooks.styles.css" asp-append-version="true" />
-     @* --- ADD THIS LINE --- *@
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     @await RenderSectionAsync("Styles", required: false)
-    @* ------------------- *@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm custom-navbar box-shadow mb-3">
+       <nav class="navbar navbar-expand-md navbar-toggleable-md custom-navbar box-shadow mb-3">
             <div class="container-fluid">
-                @* --- Logo Area --- *@
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-               
                     <img src="~/images/logo.png" alt="MvcBooks Library Logo" class="navbar-logo" />
                 </a>
-                @* --- No other nav items or toggler needed --- *@
-             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end"> @* Use justify-content-end or ms-auto on ul *@
-                    <ul class="navbar-nav">
-                         @* --- Add the Login Partial Here --- *@
+
+                <div class="flex-grow-1 d-flex justify-content-center px-md-3 search-suggestions-container"> @* Added class *@
+                    <form class="navbar-search-form-always-visible" role="search" method="get" asp-controller="Home" asp-action="Search" autocomplete="off"> @* Disable browser autocomplete *@
+                        <div class="input-group input-group-sm">
+                            <input class="form-control" type="search" id="navbarSearchInput" name="searchTerm" placeholder="Search Books..." aria-label="Search" aria-haspopup="true" aria-controls="search-suggestions" required>
+                            <button class="btn btn-outline-light" type="submit"><i class="fas fa-search"></i></button>
+                        </div>
+                        @* --- START: Suggestions Dropdown Container --- *@
+                        <ul id="search-suggestions" class="dropdown-menu" aria-labelledby="navbarSearchInput">
+                            @* Suggestions will be populated here by JavaScript *@
+                        </ul>
+                         @* --- END: Suggestions Dropdown Container --- *@
+                    </form>
+                </div>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarLoginContent" aria-controls="navbarLoginContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <i class="fas fa-user-circle toggler-icon-custom"></i>
+                </button>
+
+                <div class="collapse navbar-collapse flex-grow-0" id="navbarLoginContent">
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                         <partial name="_LoginPartial" />
-                         @* ---------------------------------- *@
                     </ul>
                 </div>
-                 @* OR place it outside the collapsible div if always visible *@
-                 @* <div class="ms-auto"> *@
-                 @*    <partial name="_LoginPartial" /> *@
-                 @* </div> *@
-
             </div>
         </nav>
     </header>
@@ -42,11 +50,13 @@
         </main>
     </div>
 
+    @* --- Footer --- *@
     <footer class="border-top footer text-muted">
         <div class="container">
-            © 2025 - MvcBooks - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            © @DateTime.Now.Year - MvcBooks - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

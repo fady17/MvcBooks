@@ -48,8 +48,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>r0z33ldvbc</Fingerprint>
-      <Integrity>C7u3EbFlnC8AtoLxUPACFw5CfN/BMSpmEdPN+Z2C0SQ=</Integrity>
+      <Fingerprint>jagwe7rdf1</Fingerprint>
+      <Integrity>e1R7mJLT1h8tD7DcsmXjjdSDkUGDKAEhAHyB6ZD6a50=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</OriginalItemSpec>
@@ -89,6 +89,24 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\covers\153e3eff-f349-4e13-933e-3f0f998bc463.png'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\covers\50fc6c44-7f1d-472b-8bf9-278ae69d8b34.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>MvcBooks</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/MvcBooks</BasePath>
+      <RelativePath>images/covers/50fc6c44-7f1d-472b-8bf9-278ae69d8b34.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>b1ydyqvxrv</Fingerprint>
+      <Integrity>cdipnnTIFWjezgkf9vg4wUhNmPVgt60cSgnBBDUGFEQ=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\covers\50fc6c44-7f1d-472b-8bf9-278ae69d8b34.png'))</OriginalItemSpec>
     </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\hero-background.jpg'))">
       <SourceType>Package</SourceType>
@@ -144,6 +162,60 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\placeholder-cover.png'))</OriginalItemSpec>
     </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\placeholder-profile.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>MvcBooks</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/MvcBooks</BasePath>
+      <RelativePath>images/placeholder-profile.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>wtgwkd5h07</Fingerprint>
+      <Integrity>NJXbaAgc/WcHIakAiUS81PWHBLg5IT+3pukN4gBvALA=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\placeholder-profile.png'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\profiles\4dafbf72-3b9c-4f24-be15-d434d4d94424_e5e545a9-760f-4e90-8ca1-91405ac695a3.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>MvcBooks</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/MvcBooks</BasePath>
+      <RelativePath>images/profiles/4dafbf72-3b9c-4f24-be15-d434d4d94424_e5e545a9-760f-4e90-8ca1-91405ac695a3.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>at15bw370j</Fingerprint>
+      <Integrity>bvP+qOqLO3U2Ep9jO+yq2Szf3EvSKolgIxITjpjCuYM=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\profiles\4dafbf72-3b9c-4f24-be15-d434d4d94424_e5e545a9-760f-4e90-8ca1-91405ac695a3.png'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\profiles\fe01ed1b-232b-48dd-b5f1-a7e22d58dec1_ab55b6f7-da5c-4f2f-9188-34d682ab3665.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>MvcBooks</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/MvcBooks</BasePath>
+      <RelativePath>images/profiles/fe01ed1b-232b-48dd-b5f1-a7e22d58dec1_ab55b6f7-da5c-4f2f-9188-34d682ab3665.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>gpkglru9kb</Fingerprint>
+      <Integrity>LJLGtk0SglH53xdI0yKix67gogg95mFSSVfy+yMyHNM=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\profiles\fe01ed1b-232b-48dd-b5f1-a7e22d58dec1_ab55b6f7-da5c-4f2f-9188-34d682ab3665.png'))</OriginalItemSpec>
+    </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\site.js'))">
       <SourceType>Package</SourceType>
       <SourceId>MvcBooks</SourceId>
@@ -156,8 +228,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>xtxxf3hu2r</Fingerprint>
-      <Integrity>hRQyftXiu1lLX2P9Ly9xa4gHJgLeR1uGN5qegUobtGo=</Integrity>
+      <Fingerprint>75lfwsl4ln</Fingerprint>
+      <Integrity>NYdQUsJuPN/RJUEIl/62HKiEP8kcFPwKlpd5tUPHmWY=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\site.js'))</OriginalItemSpec>

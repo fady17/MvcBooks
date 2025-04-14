@@ -1,0 +1,245 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Manage Your Account"; // Broader title
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+
+<div class="row">
+    <div class="col-md-12">
+
+        @* --- Section 1: Core Profile Info --- *@
+        <div class="card manage-section-card mb-4">
+             <div class="card-header">
+                <h5><i class="fas fa-user-edit me-2"></i>Basic Information</h5>
+             </div>
+            <div class="card-body">
+                 <form id="profile-form" method="post" enctype="multipart/form-data" asp-page-handler="UpdateProfile"> @* Added handler here *@
+                    @* ... (Profile picture and Name/Phone form fields as corrected before) ... *@
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+                    <div class="row">
+                       <div class="col-md-4 text-center mb-3 mb-md-0"> @* Profile Picture Column *@
+                             <label class="form-label d-block">Profile Picture</label>
+                             <img id="profilePicturePreview" src="@(string.IsNullOrEmpty(Model.ProfileInput.ExistingProfilePictureUrl) ? "/images/placeholder-profile.png" : Model.ProfileInput.ExistingProfilePictureUrl)" alt="Profile Picture" class="img-thumbnail rounded-circle mb-2" style="height: 150px; width: 150px; object-fit: cover;" onerror="this.onerror=null; this.src='/images/placeholder-profile.png';" />
+                            <div class="mt-1">
+                                 <input asp-for="ProfileInput.ProfileImageUpload" type="file" accept="image/*" class="form-control form-control-sm" onchange="document.getElementById('profilePicturePreview').src = window.URL.createObjectURL(this.files[0])" />
+                                 <span asp-validation-for="ProfileInput.ProfileImageUpload" class="text-danger d-block"></span>
+                                 <small class="form-text text-muted d-block">Max 2MB: JPG, PNG, GIF</small>
+                            </div>
+                        </div>
+                        <div class="col-md-8"> @* User Details Column *@
+                            <div class="form-floating mb-3">
+                                <input asp-for="Username" class="form-control" placeholder="Username" disabled />
+                                <label asp-for="Username"></label>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                     <div class="form-floating mb-3">
+                                        <input asp-for="ProfileInput.FirstName" class="form-control" placeholder="First Name" />
+                                        <label asp-for="ProfileInput.FirstName"></label>
+                                        <span asp-validation-for="ProfileInput.FirstName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                 <div class="col-sm-6">
+                                     <div class="form-floating mb-3">
+                                        <input asp-for="ProfileInput.LastName" class="form-control" placeholder="Last Name" />
+                                        <label asp-for="ProfileInput.LastName"></label>
+                                        <span asp-validation-for="ProfileInput.LastName" class="text-danger"></span>
+                                    </div>
+                                 </div>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input asp-for="ProfileInput.PhoneNumber" class="form-control" placeholder="Phone Number"/>
+                                <label asp-for="ProfileInput.PhoneNumber"></label>
+                                <span asp-validation-for="ProfileInput.PhoneNumber" class="text-danger"></span>
+                            </div>
+                            <button id="update-profile-button" type="submit" class="btn btn-themed-primary">
+                                <i class="fas fa-save me-1"></i> Update Profile
+                            </button>
+                        </div>
+                    </div>
+                 </form>
+            </div>
+        </div>
+
+        @* --- Section 2: Email --- *@
+        <div class="card manage-section-card mb-4">
+             <div class="card-header">
+                 <h5><i class="fas fa-envelope me-2"></i>Email Address</h5>
+             </div>
+            <div class="card-body">
+                 <p class="mb-1">Current Email:</p>
+                 <p class="lead"><strong>@Model.Email</strong>
+                    @if(Model.IsEmailConfirmed) {
+                         <span class="badge bg-success ms-1 align-middle"><i class="fas fa-check-circle me-1"></i>Verified</span>
+                    } else {
+                         <span class="badge bg-warning text-dark ms-1 align-middle"><i class="fas fa-exclamation-triangle me-1"></i>Not Verified</span>
+                    }
+                 </p>
+                 <div class="mt-3">
+                    <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#changeEmailModal">
+                        <i class="fas fa-pencil-alt me-1"></i> Change Email
+                    </button>
+                    @if (!Model.IsEmailConfirmed)
+                    {
+                        <form method="post" class="d-inline-block">
+                            <button id="send-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-outline-info btn-sm ms-2">
+                                <i class="fas fa-paper-plane me-1"></i> Send Verification Email
+                            </button>
+                        </form>
+                    }
+                 </div>
+            </div>
+        </div>
+
+        @* --- Section 3: Password --- *@
+        <div class="card manage-section-card mb-4">
+             <div class="card-header">
+                 <h5><i class="fas fa-key me-2"></i>Password</h5>
+             </div>
+             <div class="card-body">
+                 <p>Ensure your account is using a long, random password to stay secure.</p>
+                 <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                     <i class="fas fa-lock me-1"></i> Change Password
+                 </button>
+             </div>
+        </div>
+
+        @* --- Section 4: Two-Factor Authentication --- *@
+        <div class="card manage-section-card mb-4">
+             <div class="card-header">
+                 <h5><i class="fas fa-mobile-alt me-2"></i>Two-Factor Authentication (2FA)</h5>
+             </div>
+             <div class="card-body">
+                 <p>Add an additional layer of security to your account using an authenticator app.</p>
+                 @* Link directly to the existing Identity 2FA page *@
+                 <a asp-page="./TwoFactorAuthentication" class="btn btn-outline-secondary btn-sm">
+                     <i class="fas fa-shield-alt me-1"></i> Configure Two-Factor Authentication
+                 </a>
+             </div>
+        </div>
+
+        @* --- Section 5: Account Actions / Personal Data --- *@
+         <div class="card manage-section-card mb-4">
+             <div class="card-header">
+                 <h5><i class="fas fa-database me-2"></i>Account Data & Actions</h5>
+             </div>
+             <div class="card-body">
+                 <p>Manage your personal data stored by this application.</p>
+                 <form method="post" class="d-inline-block me-2">
+                     <button type="submit" asp-page-handler="DownloadPersonalData" class="btn btn-outline-info btn-sm">
+                        <i class="fas fa-download me-1"></i> Download Your Data
+                     </button>
+                 </form>
+                 <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    <i class="fas fa-trash-alt me-1"></i> Delete Account
+                 </button>
+             </div>
+        </div>
+
+    </div>
+</div>
+
+@* --- START: Modals --- *@
+
+@* Change Password Modal (Already added fields) *@
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changePasswordModalLabel">Change Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="change-password-form" method="post" asp-page-handler="ChangePassword">
+          <div class="modal-body">
+              <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+              <div class="form-floating mb-3">
+                  <input asp-for="ChangePasswordInput.OldPassword" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Old Password." />
+                  <label asp-for="ChangePasswordInput.OldPassword" class="form-label"></label>
+                  <span asp-validation-for="ChangePasswordInput.OldPassword" class="text-danger"></span>
+              </div>
+              <div class="form-floating mb-3">
+                   <input asp-for="ChangePasswordInput.NewPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="New Password." />
+                   <label asp-for="ChangePasswordInput.NewPassword" class="form-label"></label>
+                   <span asp-validation-for="ChangePasswordInput.NewPassword" class="text-danger"></span>
+              </div>
+               <div class="form-floating mb-3">
+                   <input asp-for="ChangePasswordInput.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Confirm New Password." />
+                   <label asp-for="ChangePasswordInput.ConfirmPassword" class="form-label"></label>
+                   <span asp-validation-for="ChangePasswordInput.ConfirmPassword" class="text-danger"></span>
+               </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Update Password</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@* Change Email Modal *@
+<div class="modal fade" id="changeEmailModal" tabindex="-1" aria-labelledby="changeEmailModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="changeEmailModalLabel">Change Email Address</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="change-email-form" method="post" asp-page-handler="ChangeEmail">
+          <div class="modal-body">
+              <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+              <p>Current Email: <strong>@Model.Email</strong></p>
+              <div class="form-floating mb-3">
+                   <input asp-for="ChangeEmailInput.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="New Email Address." />
+                   <label asp-for="ChangeEmailInput.NewEmail" class="form-label"></label>
+                   <span asp-validation-for="ChangeEmailInput.NewEmail" class="text-danger"></span>
+               </div>
+               <small class="text-muted">A confirmation link will be sent to your new email address.</small>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Send Confirmation</button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@* Delete Account Confirmation Modal *@
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteAccountModalLabel"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Account Deletion</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      @* We need a separate page/handler for actual deletion, this modal just confirms intent *@
+      <form id="delete-account-form" method="post" asp-page="./DeletePersonalData"> @* Redirect to standard delete page *@
+          <div class="modal-body">
+              <p class="fw-bold text-danger">This action is permanent and cannot be undone!</p>
+              <p>Deleting your account will permanently remove all your data, including uploaded books and profile information.</p>
+              <p>Are you absolutely sure you want to delete your account?</p>
+          </div>
+          <div class="modal-footer justify-content-between"> @* Space out buttons *@
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            @* This button doesn't submit here, it redirects to the DeletePersonalData page *@
+             <a asp-page="./DeletePersonalData" class="btn btn-danger">Yes, Proceed to Delete Account</a>
+             @* Alternative if using a direct handler:
+             <button type="submit" asp-page-handler="DeleteAccount" class="btn btn-danger">Yes, Delete My Account</button>
+             *@
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+@* --- END: Modals --- *@
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+}

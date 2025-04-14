@@ -16,10 +16,10 @@ namespace MvcBooks.Models.ViewModels
         public string? Description { get; set; }
 
         [Display(Name = "Cover Image")]
-        public IFormFile? CoverImage { get; set; } // For upload
+        public IFormFile? CoverImage { get; set; } 
 
         [Display(Name = "Current Cover")]
-        public string? ExistingCoverUrl { get; set; } // For showing existing in Edit view
+        public string? ExistingCoverUrl { get; set; } 
 
         [Display(Name = "Publication Date")]
         [DataType(DataType.Date)]
@@ -30,28 +30,31 @@ namespace MvcBooks.Models.ViewModels
         public string? Author { get; set; }
 
         [Display(Name = "Categories")]
-        public List<int>? SelectedCategoryIds { get; set; } // For binding selected category IDs
+        public List<int>? SelectedCategoryIds { get; set; } 
 
-        public IEnumerable<Category>? AvailableCategories { get; set; } // For populating selection options
+        public IEnumerable<Category>? AvailableCategories { get; set; } 
 
-        // --- EPUB Source Options ---
+       
 
         [Display(Name = "Upload EPUB File")]
-        // REMOVED [Required] to allow providing URL instead. Controller will check.
-        public IFormFile? EpubFile { get; set; } // For upload
+        
+        public IFormFile? EpubFile { get; set; } 
 
         [Display(Name = "Current EPUB File")]
-        public string? ExistingEpubFileName { get; set; } // For showing existing in Edit view (if file was uploaded)
+        public string? ExistingEpubFileName { get; set; } 
 
-        // We still need ExistingBookUrl for Edit context if allowing URL option
+       
         [Display(Name = "Current Book URL")]
-        public string? ExistingBookUrl { get; set; } // For showing existing URL in Edit view
+        public string? ExistingBookUrl { get; set; } 
 
 
         [Display(Name = "OR Enter Book URL")]
         [StringLength(2048)]
         [Url(ErrorMessage = "Please enter a valid URL (e.g., https://example.com/book.epub)")]
-        public string? BookUrl { get; set; } // For linking to external source
+        public string? BookUrl { get; set; } 
+
+        [Display(Name = "Make Publicly Visible on Home Page?")]
+        public bool IsPublic { get; set; } = true; 
 
 
     }

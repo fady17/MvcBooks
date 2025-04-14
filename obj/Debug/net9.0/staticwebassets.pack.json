@@ -25,6 +25,10 @@
       "PackagePath": "staticwebassets/images/covers/153e3eff-f349-4e13-933e-3f0f998bc463.png"
     },
     {
+      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/covers/50fc6c44-7f1d-472b-8bf9-278ae69d8b34.png",
+      "PackagePath": "staticwebassets/images/covers/50fc6c44-7f1d-472b-8bf9-278ae69d8b34.png"
+    },
+    {
       "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/hero-background.jpg",
       "PackagePath": "staticwebassets/images/hero-background.jpg"
     },
@@ -35,6 +39,18 @@
     {
       "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-cover.png",
       "PackagePath": "staticwebassets/images/placeholder-cover.png"
+    },
+    {
+      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-profile.png",
+      "PackagePath": "staticwebassets/images/placeholder-profile.png"
+    },
+    {
+      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/profiles/4dafbf72-3b9c-4f24-be15-d434d4d94424_e5e545a9-760f-4e90-8ca1-91405ac695a3.png",
+      "PackagePath": "staticwebassets/images/profiles/4dafbf72-3b9c-4f24-be15-d434d4d94424_e5e545a9-760f-4e90-8ca1-91405ac695a3.png"
+    },
+    {
+      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/profiles/fe01ed1b-232b-48dd-b5f1-a7e22d58dec1_ab55b6f7-da5c-4f2f-9188-34d682ab3665.png",
+      "PackagePath": "staticwebassets/images/profiles/fe01ed1b-232b-48dd-b5f1-a7e22d58dec1_ab55b6f7-da5c-4f2f-9188-34d682ab3665.png"
     },
     {
       "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/js/site.js",

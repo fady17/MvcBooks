@@ -147,7 +147,6 @@
 /Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/scopedcss/bundle/MvcBooks.styles.css
 /Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/scopedcss/projectbundle/MvcBooks.bundle.scp.css
 /Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/ojyop8tbpq-61n19gt1b8.gz
-/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-xtxxf3hu2r.gz
 /Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/c7op314h9d-bqjiyaj88i.gz
 /Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/rxn78hacqu-c2jlpeoesf.gz
 /Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/5j7mm2xy4p-erw9l3u2r3.gz
@@ -407,6 +406,8 @@
 /Users/fady/Desktop/wdt/MvcBooks/bin/Debug/net9.0/tr/Microsoft.CodeAnalysis.Scripting.resources.dll
 /Users/fady/Desktop/wdt/MvcBooks/bin/Debug/net9.0/zh-Hans/Microsoft.CodeAnalysis.Scripting.resources.dll
 /Users/fady/Desktop/wdt/MvcBooks/bin/Debug/net9.0/zh-Hant/Microsoft.CodeAnalysis.Scripting.resources.dll
-/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-r0z33ldvbc.gz
 /Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/uyl9y5bhrp-lgok3489ib.gz
 /Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/nwypyv6oh8-aqzw5sl8rd.gz
+/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/MvcBooks.sourcelink.json
+/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-jagwe7rdf1.gz
+/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-75lfwsl4ln.gz

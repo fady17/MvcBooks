@@ -4,152 +4,159 @@
     ViewData["Title"] = "Add New Book";
 }
 
-<h1>Add New Book</h1>
-<hr />
+@* Removed the top-level H1 and HR, the card will provide structure *@
+@* <h1>Add New Book</h1> *@
+@* <hr /> *@
 
-<div class="row">
-    <div class="col-md-8">
-        @* --- Important: enctype is required for file uploads --- *@
-        <form asp-action="Create" method="post" enctype="multipart/form-data">
+@* Use a container or row to manage the card width and centering if desired *@
+<div class="row justify-content-center"> 
+    <div class="col-lg-10 col-xl-8"> @* Control max width of the card/form area *@
 
-            @* Display validation summary for model-level errors (like the custom EITHER/OR check) *@
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            @* --- Basic Book Details --- *@
-            <div class="mb-3">
-                <label asp-for="Title" class="form-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+        <div class="card auth-card shadow-sm mb-4"> @* --- Phase 1: Card Container --- *@
+            <div class="card-header bg-light py-3"> @* Optional Header *@
+                 <h4 class="mb-0 auth-title">@ViewData["Title"]</h4>
             </div>
+            <div class="card-body p-4"> @* --- Phase 1: Card Body --- *@
 
-            <div class="mb-3">
-                <label asp-for="Author" class="form-label"></label>
-                <input asp-for="Author" class="form-control" />
-                <span asp-validation-for="Author" class="text-danger"></span>
-            </div>
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
 
-            <div class="mb-3">
-                <label asp-for="Description" class="form-label"></label>
-                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
 
-            <div class="mb-3">
-                <label asp-for="PublishedDate" class="form-label"></label>
-                <input asp-for="PublishedDate" type="date" class="form-control" /> @* Use type="date" for better UX *@
-                <span asp-validation-for="PublishedDate" class="text-danger"></span>
-            </div>
+                    @* --- START Section 1: Basic Details --- *@
+                    <h5 class="form-section-header mb-3">Book Details</h5> @* --- Phase 1: Section Header --- *@
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3"> @* --- Phase 1: Grid Layout --- *@
+                            <label asp-for="Title" class="form-label"></label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6 mb-3"> @* --- Phase 1: Grid Layout --- *@
+                            <label asp-for="Author" class="form-label"></label>
+                            <input asp-for="Author" class="form-control" />
+                            <span asp-validation-for="Author" class="text-danger"></span>
+                        </div>
+                    </div>
 
-            <div class="mb-3">
-                <label asp-for="CoverImage" class="form-label"></label>
-                <input asp-for="CoverImage" type="file" accept="image/*" class="form-control" />
-                <span asp-validation-for="CoverImage" class="text-danger"></span>
-                <small class="form-text text-muted">Upload a cover image (optional).</small>
-            </div>
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                    
+                    <div class="row">
+                       <div class="col-md-6 mb-3"> @* --- Phase 1: Grid Layout --- *@
+                            <label asp-for="PublishedDate" class="form-label"></label>
+                            <input asp-for="PublishedDate" type="date" class="form-control" /> 
+                            <span asp-validation-for="PublishedDate" class="text-danger"></span>
+                        </div>
+                         <div class="col-md-6 mb-3"> @* --- Phase 1: Grid Layout --- *@
+                             <label asp-for="CoverImage" class="form-label">
+                                 <i class="fas fa-image"></i> @* --- Phase 3: Icon --- *@
+                                 Cover Image (Optional)
+                             </label>
+                            <input asp-for="CoverImage" type="file" accept="image/*" class="form-control" />
+                            <span asp-validation-for="CoverImage" class="text-danger"></span>
+                            @* Removed redundant help text, label is clear *@
+                            @* <small class="form-text text-muted">Upload a cover image (optional).</small> *@
+                        </div>
+                    </div>
+                    @* --- END Section 1 --- *@
 
-            <hr />
-            @* --- EPUB Source Section (EITHER File OR URL) --- *@
-            <h5 class="mb-3">Book Content Source</h5>
-            <p class="text-muted"><small>Provide the book content by either uploading an EPUB file OR entering a URL to an existing EPUB.</small></p>
 
-            <div class="mb-3">
-                <label asp-for="EpubFile" class="form-label"></label>
-                <input asp-for="EpubFile" type="file" accept=".epub" class="form-control" />
-                <span asp-validation-for="EpubFile" class="text-danger"></span>
-                <small class="form-text text-muted">Select an EPUB file from your computer.</small>
-            </div>
+                    @* --- START Section 2: Content Source --- *@
+                    <h5 class="form-section-header mb-3">Book Content Source</h5> @* --- Phase 1: Section Header --- *@
+                    <p class="text-muted mb-3"><small>Provide the book content by either uploading an EPUB file OR entering a URL to an existing EPUB.</small></p>
 
-            <div class="text-center my-2 fw-bold">OR</div>
+                    <div class="mb-3">
+                         <label asp-for="EpubFile" class="form-label">
+                             <i class="fas fa-upload"></i> @* --- Phase 2/3: Icon --- *@
+                             Upload EPUB File
+                         </label>
+                        <input asp-for="EpubFile" type="file" accept=".epub" class="form-control" />
+                        <span asp-validation-for="EpubFile" class="text-danger"></span>
+                        @* <small class="form-text text-muted">Select an EPUB file from your computer.</small> *@
+                    </div>
 
-            <div class="mb-3">
-                <label asp-for="BookUrl" class="form-label"></label>
-                <input asp-for="BookUrl" type="url" class="form-control" placeholder="https://example.com/path/to/book.epub" />
-                <span asp-validation-for="BookUrl" class="text-danger"></span>
-                <small class="form-text text-muted">Enter a direct URL to an EPUB file hosted elsewhere.</small>
-            </div>
-             @* --- End EPUB Source Section --- *@
-            <hr />
+                    @* --- Phase 2: OR Divider --- *@
+                    <div class="form-divider-or">OR</div> 
 
-            @* --- Category Selection --- *@
-            <div class="mb-3">
-                <label class="form-label">Categories</label>
-                 @if (Model.AvailableCategories == null || !Model.AvailableCategories.Any())
-                {
-                     <div class="alert alert-warning">No categories found. Please add categories first.</div>
-                }
-                else
-                {
-                    <div class="row checkbox-list"> @* Added class for potential styling *@
-                        @foreach (var category in Model.AvailableCategories.OrderBy(c => c.Name)) @* Order for consistency *@
+                    <div class="mb-3">
+                         <label asp-for="BookUrl" class="form-label">
+                             <i class="fas fa-link"></i> @* --- Phase 2/3: Icon --- *@
+                             Enter Book URL
+                         </label>
+                        <input asp-for="BookUrl" type="url" class="form-control" placeholder="https://example.com/path/to/book.epub" />
+                        <span asp-validation-for="BookUrl" class="text-danger"></span>
+                        @* <small class="form-text text-muted">Enter a direct URL to an EPUB file hosted elsewhere.</small> *@
+                    </div>
+                    @* --- END Section 2 --- *@
+
+
+                    @* --- START Section 3: Categorization & Visibility --- *@
+                    <h5 class="form-section-header mb-3">Categorization & Visibility</h5> @* --- Phase 1: Section Header --- *@
+
+                    <div class="mb-3">
+                        <label class="form-label d-block">Categories</label> @* Use d-block for spacing consistency *@
+                         @if (Model.AvailableCategories == null || !Model.AvailableCategories.Any())
                         {
-                            <div class="col-md-4 col-sm-6 mb-2">
-                                <div class="form-check">
-                                    <input type="checkbox"
-                                           name="SelectedCategoryIds" @* Must match ViewModel property name *@
-                                           value="@category.Id"
-                                           id="category_@category.Id"
-                                           class="form-check-input"
-                                           @(Model.SelectedCategoryIds?.Contains(category.Id) ?? false ? "checked" : "") /> @* Handle pre-selection if needed on redisplay *@
-                                    <label class="form-check-label" for="category_@category.Id">@category.Name</label>
+                             <div class="alert alert-warning py-2">No categories found. Please add categories first.</div>
+                        }
+                        else
+                        {
+                            @* --- Phase 2: Scrollable Container --- *@
+                            <div class="checkbox-list-container mb-2"> 
+                                <div class="row checkbox-list">
+                                    @foreach (var category in Model.AvailableCategories.OrderBy(c => c.Name))
+                                    {
+                                        <div class="col-md-4 col-sm-6 mb-2">
+                                            <div class="form-check">
+                                                <input type="checkbox"
+                                                       name="SelectedCategoryIds" 
+                                                       value="@category.Id"
+                                                       id="category_@category.Id"
+                                                       class="form-check-input"
+                                                       @(Model.SelectedCategoryIds?.Contains(category.Id) ?? false ? "checked" : "") /> 
+                                                <label class="form-check-label" for="category_@category.Id">@category.Name</label>
+                                            </div>
+                                        </div>
+                                    }
                                 </div>
                             </div>
+                             <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span> 
                         }
                     </div>
-                     <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span> @* Add validation message if needed (e.g., require at least one) *@
-                }
-            </div>
-             @* --- End Category Selection --- *@
+                   
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" asp-for="IsPublic">
+                             @* Use the DisplayName from the ViewModel *@
+                            <label class="form-check-label" asp-for="IsPublic"></label> 
+                         </div>
+                        <small class="form-text text-muted">Check this box to make the book visible on the public home page. Uncheck to keep it private to your account.</small>
+                        <span asp-validation-for="IsPublic" class="text-danger"></span>
+                    </div>
+                    @* --- END Section 3 --- *@
 
 
-            @* --- Submit Button --- *@
-            <div class="form-group mt-4 mb-3"> @* Consistent spacing *@
-                <button type="submit" class="btn btn-primary">Create Book</button>
-                <a asp-action="Index" class="btn btn-outline-secondary ms-2">Back to List</a>
-            </div>
-        </form>
-    </div>
+                    @* --- Submit/Cancel Buttons --- *@
+                    <div class="d-flex justify-content-end mt-4 pt-3 border-top"> @* --- Phase 3: Alignment & Border --- *@
+                        <a asp-area="Identity" asp-page="/Account/Manage/MyBooks" class="btn btn-outline-secondary me-2">Cancel</a> 
+                        <button type="submit" class="btn btn-themed-primary"> @* --- Phase 3: Themed Button --- *@
+                            <i class="fas fa-plus-circle me-1"></i> Create Book
+                         </button>
+                    </div>
+                    
+                </form>
+            </div> @* End Card Body *@
+        </div> @* End Card *@
+    </div> @* End Col for Width Control *@
+</div> @* End Row for Centering *@
 
-    @* Optional: Add a side column for instructions or tips *@
-    @* <div class="col-md-4">
-        <div class="alert alert-info">
-             <h5 class="alert-heading">Tips</h5>
-             <p>Please provide either an EPUB file upload or a valid URL.</p>
-             <p>Ensure the cover image is clear.</p>
-        </div>
-    </div> *@
-</div>
 
-@* --- Validation Scripts --- *@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @* Add Font Awesome if not already loaded globally *@
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
-    @* Optional: Add client-side script to visually disable one source input if the other has value?
-       (Server-side validation is still the primary check)
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const epubFileInput = document.getElementById('@Html.IdFor(m => m.EpubFile)');
-            const bookUrlInput = document.getElementById('@Html.IdFor(m => m.BookUrl)');
-
-            epubFileInput.addEventListener('change', function () {
-                if (this.files.length > 0) {
-                    // Optionally disable or clear URL input
-                    // bookUrlInput.disabled = true;
-                    // bookUrlInput.value = '';
-                } else {
-                    // bookUrlInput.disabled = false;
-                }
-            });
-
-            bookUrlInput.addEventListener('input', function () {
-                if (this.value.trim() !== '') {
-                    // Optionally disable or clear file input
-                    // epubFileInput.disabled = true;
-                    // epubFileInput.value = null; // Clear file selection
-                } else {
-                    // epubFileInput.disabled = false;
-                }
-            });
-        });
-    </script>
-    *@
 }

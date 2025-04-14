@@ -13,17 +13,17 @@ using Microsoft.EntityFrameworkCore;
 using MvcBooks.Models;
 using MvcBooks.Models.Data;
 using MvcBooks.Models.ViewModels;
+using Microsoft.AspNetCore.Identity;
 
 namespace MvcBooks.Controllers
 {
-    [Authorize] // Apply authorization to the whole controller
+    [Authorize]
     public class BooksController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _hostEnvironment;
-        private readonly string _coverImageFolder = Path.Combine("images", "covers"); // Relative path within wwwroot
-        private readonly string _epubFileFolder = Path.Combine("books");             // Relative path within wwwroot
-
+        private readonly string _coverImageFolder = Path.Combine("images", "covers");
+        private readonly string _epubFileFolder = Path.Combine("books");
 
         public BooksController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
@@ -31,56 +31,18 @@ namespace MvcBooks.Controllers
             _hostEnvironment = hostEnvironment;
         }
 
-        // Helper method to get absolute path
-        private string GetAbsolutePath(string relativePath)
-        {
-            return Path.Combine(_hostEnvironment.WebRootPath, relativePath);
-        }
-
-        // Helper method to delete a file safely
-        private void DeleteFile(string? relativePath)
-        {
-            if (!string.IsNullOrEmpty(relativePath))
-            {
-                string absolutePath = GetAbsolutePath(relativePath.TrimStart('/'));
-                if (System.IO.File.Exists(absolutePath))
-                {
-                    try {
-                        System.IO.File.Delete(absolutePath);
-                    } catch (IOException)
-                    {
-                        // Log the error, but don't necessarily block operation
-                        // E.g., _logger.LogError(ex, "Could not delete file: {Path}", absolutePath);
-                    }
-                }
-            }
-        }
-
-        // GET: Books
-        [AllowAnonymous] // Allow anyone to view the list
-        public async Task<IActionResult> Index()
-        {
-            var books = await _context.Books
-                .Include(b => b.Categories)
-                // .Include(b => b.User) // Optional: Include user if displaying who added it
-                .OrderBy(b => b.Title) // Example ordering
-                .ToListAsync();
-            return View(books);
-        }
+        // --- Index() action removed ---
 
         // GET: Books/Details/5
-        [AllowAnonymous] // Allow anyone to view details
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
-
             var book = await _context.Books
                 .Include(b => b.Categories)
-                .Include(b => b.User) // Include user for display
+                .Include(b => b.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
             if (book == null) return NotFound();
-
             return View(book);
         }
 
@@ -89,8 +51,9 @@ namespace MvcBooks.Controllers
         {
             BookViewModel viewModel = new BookViewModel
             {
-                PublishedDate = DateTime.Today, // Default to today's date
-                AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync()
+                PublishedDate = DateTime.Today,
+                AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync(),
+                IsPublic = true
             };
             return View(viewModel);
         }
@@ -100,36 +63,26 @@ namespace MvcBooks.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BookViewModel viewModel)
         {
-            // --- Custom Validation: Ensure at least one source (File or URL) ---
             bool hasFile = viewModel.EpubFile != null && viewModel.EpubFile.Length > 0;
             bool hasUrl = !string.IsNullOrWhiteSpace(viewModel.BookUrl);
 
-            if (!hasFile && !hasUrl)
-            {
-                ModelState.AddModelError("", "Either an EPUB file must be uploaded or a Book URL must be provided.");
-            }
-            if (hasFile && hasUrl)
-            {
-                 ModelState.AddModelError("", "Please provide either an EPUB file upload OR a Book URL, not both.");
-            }
-            // --- End Custom Validation ---
+            if (!hasFile && !hasUrl) { ModelState.AddModelError("", "Either an EPUB file must be uploaded or a Book URL must be provided."); }
+            if (hasFile && hasUrl) { ModelState.AddModelError("", "Please provide either an EPUB file upload OR a Book URL, not both."); }
 
-            // Re-populate categories if validation fails before checking ModelState
             if (!ModelState.IsValid)
             {
                 viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
                 return View(viewModel);
             }
 
-            // Passed validation, proceed with creation
             Book book = new Book
             {
                 Title = viewModel.Title,
                 Description = viewModel.Description,
                 PublishedDate = viewModel.PublishedDate,
                 Author = viewModel.Author,
-                UserId = User.FindFirstValue(ClaimTypes.NameIdentifier) // Get current user ID
-                // ProjectGutenbergId removed
+                UserId = User.FindFirstValue(ClaimTypes.NameIdentifier),
+                IsPublic = viewModel.IsPublic
             };
 
             string? uploadedCoverPath = null;
@@ -138,65 +91,43 @@ namespace MvcBooks.Controllers
 
             try
             {
-                 // Handle cover image upload if provided
                 if (viewModel.CoverImage != null && viewModel.CoverImage.Length > 0)
                 {
-                    string coverFolderFullPath = GetAbsolutePath(_coverImageFolder);
-                    Directory.CreateDirectory(coverFolderFullPath); // Ensure exists
-                    string uniqueCoverFileName = Guid.NewGuid().ToString() + Path.GetExtension(viewModel.CoverImage.FileName);
-                    string coverFilePath = Path.Combine(coverFolderFullPath, uniqueCoverFileName);
-
-                    using (var fileStream = new FileStream(coverFilePath, FileMode.Create))
-                    {
-                        await viewModel.CoverImage.CopyToAsync(fileStream);
-                    }
-                    uploadedCoverPath = $"/{_coverImageFolder.Replace(Path.DirectorySeparatorChar, '/')}/{uniqueCoverFileName}"; // Store relative path
+                    // *** FIX: Use null-forgiving operator '!' ***
+                    uploadedCoverPath = await SaveFileAsync(viewModel.CoverImage!, _coverImageFolder);
                     book.CoverImageUrl = uploadedCoverPath;
                 }
 
-                // Handle EPUB source (Prioritize uploaded file if both were somehow provided despite validation)
                 if (hasFile)
                 {
-                    string epubFolderFullPath = GetAbsolutePath(_epubFileFolder);
-                     Directory.CreateDirectory(epubFolderFullPath); // Ensure exists
-                    string uniqueEpubFileName = Guid.NewGuid().ToString() + ".epub"; // Ensure .epub extension
-                    string epubFilePath = Path.Combine(epubFolderFullPath, uniqueEpubFileName);
-
-                    using (var fileStream = new FileStream(epubFilePath, FileMode.Create))
-                    {
-                        await viewModel.EpubFile!.CopyToAsync(fileStream); // Use ! null-forgiving operator as hasFile check passed
-                    }
-                    uploadedEpubPath = $"/{_epubFileFolder.Replace(Path.DirectorySeparatorChar, '/')}/{uniqueEpubFileName}"; // Store relative path
+                    // *** FIX: Use null-forgiving operator '!' ***
+                    uploadedEpubPath = await SaveFileAsync(viewModel.EpubFile!, _epubFileFolder, ensureExtension: ".epub");
+                    // *** FIX: Use null-forgiving operator '!' ***
                     uploadedEpubName = viewModel.EpubFile!.FileName;
-
                     book.EpubFilePath = uploadedEpubPath;
                     book.EpubFileName = uploadedEpubName;
-                    book.BookUrl = null; // Ensure URL is null if file is uploaded
+                    book.BookUrl = null;
                 }
-                else if (hasUrl) // Only use URL if file was not uploaded
+                else if (hasUrl)
                 {
                     book.BookUrl = viewModel.BookUrl;
-                    book.EpubFilePath = null; // Ensure file path is null
+                    book.EpubFilePath = null;
                     book.EpubFileName = null;
                 }
 
-                // Handle category assignments
-                await UpdateBookCategories(book, viewModel.SelectedCategoryIds);
+                await UpdateBookCategoriesAsync(book, viewModel.SelectedCategoryIds);
 
                 _context.Add(book);
                 await _context.SaveChangesAsync();
-                // Consider adding a success message (TempData)
-                return RedirectToAction(nameof(Index));
+
+                TempData["SuccessMessage"] = $"Book '{book.Title}' created successfully.";
+                return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
             }
-            catch (Exception) // Catch potential exceptions during file IO or DB save
+            catch (Exception ex)
             {
-                // Log the exception (using an ILogger instance is recommended)
-                // E.g., _logger.LogError(ex, "Error creating book.");
-
-                // Clean up any files that might have been created before the error
-                DeleteFile(uploadedCoverPath);  
+                Console.WriteLine($"Error creating book: {ex.Message}");
+                DeleteFile(uploadedCoverPath);
                 DeleteFile(uploadedEpubPath);
-
                 ModelState.AddModelError("", "An unexpected error occurred while saving the book. Please try again.");
                 viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
                 return View(viewModel);
@@ -207,36 +138,18 @@ namespace MvcBooks.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-
             var book = await _context.Books
-                .Include(b => b.Categories) // Include categories to pre-select them
+                .Include(b => b.Categories)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
             if (book == null) return NotFound();
-
-            // Authorization Check: Only owner or Admin can edit
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (book.UserId != currentUserId && !User.IsInRole("Admin"))
+            if (!IsUserAuthorized(book.UserId))
             {
-                return Forbid(); // Or RedirectToAction("AccessDenied", "Account");
+                TempData["ErrorMessage"] = "You are not authorized to edit this book.";
+                return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
             }
-
-            // Map Book to BookViewModel
-            BookViewModel viewModel = new BookViewModel
-            {
-                Id = book.Id,
-                Title = book.Title,
-                Description = book.Description,
-                PublishedDate = book.PublishedDate,
-                Author = book.Author,
-                ExistingCoverUrl = book.CoverImageUrl,
-                ExistingEpubFileName = book.EpubFileName, // Show current file name
-                ExistingBookUrl = book.BookUrl,           // Show current URL
-                SelectedCategoryIds = book.Categories.Select(c => c.Id).ToList(),
-                AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync()
-                // ProjectGutenbergId removed
+            BookViewModel viewModel = new BookViewModel { /* ... mapping ... */
+                Id = book.Id, Title = book.Title, Description = book.Description, PublishedDate = book.PublishedDate, Author = book.Author, ExistingCoverUrl = book.CoverImageUrl, ExistingEpubFileName = book.EpubFileName, ExistingBookUrl = book.BookUrl, SelectedCategoryIds = book.Categories.Select(c => c.Id).ToList(), AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync(), IsPublic = book.IsPublic
             };
-
             return View(viewModel);
         }
 
@@ -247,167 +160,101 @@ namespace MvcBooks.Controllers
         {
             if (id != viewModel.Id) return NotFound();
 
-            // --- Custom Validation: Ensure at least one source (File or URL OR Existing) ---
-             bool hasNewFile = viewModel.EpubFile != null && viewModel.EpubFile.Length > 0;
-             bool hasNewUrl = !string.IsNullOrWhiteSpace(viewModel.BookUrl);
-             bool hasExistingSource = !string.IsNullOrWhiteSpace(viewModel.ExistingEpubFileName) || !string.IsNullOrWhiteSpace(viewModel.ExistingBookUrl);
+            bool hasNewFile = viewModel.EpubFile != null && viewModel.EpubFile.Length > 0;
+            bool hasNewUrl = !string.IsNullOrWhiteSpace(viewModel.BookUrl);
 
-             if (hasNewFile && hasNewUrl) // Cannot provide both new sources
-             {
-                  ModelState.AddModelError("", "Please provide either an EPUB file upload OR a Book URL, not both.");
-             }
-             // Implicit: If !hasNewFile && !hasNewUrl, we intend to keep the existing source (if any) - this is valid for Edit.
+            if (hasNewFile && hasNewUrl) { ModelState.AddModelError("", "Please provide either an EPUB file upload OR a Book URL, not both."); }
 
-             // Reload categories before checking ModelState in case of failure
-             if (!ModelState.IsValid)
-             {
-                 // Need to ensure Existing... properties are preserved if model binding fails??
-                 // They should be okay as they are part of the viewModel posted back.
-                 viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
-                 return View(viewModel);
-             }
+            if (!ModelState.IsValid)
+            {
+                viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+                return View(viewModel);
+            }
 
-            // Find the existing book, including its current categories
             var book = await _context.Books
                         .Include(b => b.Categories)
                         .FirstOrDefaultAsync(b => b.Id == id);
-
             if (book == null) return NotFound();
+            if (!IsUserAuthorized(book.UserId)) return Forbid();
 
-            // Authorization Check: Only owner or Admin can edit
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (book.UserId != currentUserId && !User.IsInRole("Admin"))
-            {
-                return Forbid();
-            }
-
-
-            string? oldCoverPath = book.CoverImageUrl; // Store old paths for potential deletion
+            string? oldCoverPath = book.CoverImageUrl;
             string? oldEpubPath = book.EpubFilePath;
-            string? uploadedCoverPath = null; // Track newly uploaded files for potential rollback
+            string? uploadedCoverPath = null;
             string? uploadedEpubPath = null;
 
             try
             {
-                // Update book properties from view model
                 book.Title = viewModel.Title;
                 book.Description = viewModel.Description;
                 book.PublishedDate = viewModel.PublishedDate;
                 book.Author = viewModel.Author;
-                // ProjectGutenbergId removed
+                book.IsPublic = viewModel.IsPublic;
 
-                // Handle Cover Image Update
                 if (viewModel.CoverImage != null && viewModel.CoverImage.Length > 0)
                 {
-                    string coverFolderFullPath = GetAbsolutePath(_coverImageFolder);
-                    Directory.CreateDirectory(coverFolderFullPath);
-                    string uniqueCoverFileName = Guid.NewGuid().ToString() + Path.GetExtension(viewModel.CoverImage.FileName);
-                    string coverFilePath = Path.Combine(coverFolderFullPath, uniqueCoverFileName);
-
-                    using (var fileStream = new FileStream(coverFilePath, FileMode.Create))
-                    {
-                        await viewModel.CoverImage.CopyToAsync(fileStream);
-                    }
-                    uploadedCoverPath = $"/{_coverImageFolder.Replace(Path.DirectorySeparatorChar, '/')}/{uniqueCoverFileName}";
+                    // *** FIX: Use null-forgiving operator '!' ***
+                    uploadedCoverPath = await SaveFileAsync(viewModel.CoverImage!, _coverImageFolder);
                     book.CoverImageUrl = uploadedCoverPath;
-
-                    // Delete the old cover image *after* successful upload & path update
                     DeleteFile(oldCoverPath);
-                 }
+                }
 
-                // Handle EPUB Source Update (Prioritize new file upload)
                 if (hasNewFile)
                 {
-                    string epubFolderFullPath = GetAbsolutePath(_epubFileFolder);
-                     Directory.CreateDirectory(epubFolderFullPath);
-                    string uniqueEpubFileName = Guid.NewGuid().ToString() + ".epub";
-                    string epubFilePath = Path.Combine(epubFolderFullPath, uniqueEpubFileName);
-
-                    using (var fileStream = new FileStream(epubFilePath, FileMode.Create))
-                    {
-                        await viewModel.EpubFile!.CopyToAsync(fileStream);
-                    }
-                    uploadedEpubPath = $"/{_epubFileFolder.Replace(Path.DirectorySeparatorChar, '/')}/{uniqueEpubFileName}";
-
-                    book.EpubFilePath = uploadedEpubPath;
+                    // *** FIX: Use null-forgiving operator '!' ***
+                    uploadedEpubPath = await SaveFileAsync(viewModel.EpubFile!, _epubFileFolder, ensureExtension: ".epub");
+                    // *** FIX: Use null-forgiving operator '!' ***
                     book.EpubFileName = viewModel.EpubFile!.FileName;
-                    book.BookUrl = null; // Clear URL if file is uploaded
-
-                    // Delete old EPUB file *after* successful upload & path update
+                    book.EpubFilePath = uploadedEpubPath;
+                    book.BookUrl = null;
                     DeleteFile(oldEpubPath);
                 }
-                else if (hasNewUrl) // Only update URL if NO new file was uploaded
+                else if (hasNewUrl)
                 {
-                    // Check if URL is actually different from existing URL to avoid unnecessary updates/deletions
                     if (book.BookUrl != viewModel.BookUrl)
                     {
                         book.BookUrl = viewModel.BookUrl;
-
-                        // If switching from File to URL, delete the old file
-                         DeleteFile(oldEpubPath); // Delete the previous file path if it existed
-                         book.EpubFilePath = null; // Clear file path properties
-                         book.EpubFileName = null;
+                        DeleteFile(oldEpubPath);
+                        book.EpubFilePath = null;
+                        book.EpubFileName = null;
                     }
                 }
-                // ELSE: If neither new file nor new URL is provided, we keep the existing book.EpubFilePath / book.BookUrl
 
-
-                // Update category assignments
-                await UpdateBookCategories(book, viewModel.SelectedCategoryIds);
+                await UpdateBookCategoriesAsync(book, viewModel.SelectedCategoryIds);
 
                 _context.Update(book);
                 await _context.SaveChangesAsync();
-                 // Consider adding a success message (TempData)
-                return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = $"Book '{book.Title}' updated successfully.";
+                return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
             }
-            catch (DbUpdateConcurrencyException) // Handle concurrency issues
+            catch (DbUpdateConcurrencyException) { if (!BookExists(viewModel.Id)) return NotFound(); else throw; }
+            catch (Exception ex)
             {
-                 if (!BookExists(viewModel.Id)) return NotFound();
-                 else throw;
+                Console.WriteLine($"Error updating book {id}: {ex.Message}");
+                DeleteFile(uploadedCoverPath);
+                DeleteFile(uploadedEpubPath);
+                ModelState.AddModelError("", "An unexpected error occurred while saving the book changes. Please try again.");
+                viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+                var originalBook = await _context.Books.AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
+                viewModel.ExistingCoverUrl = originalBook?.CoverImageUrl;
+                viewModel.ExistingEpubFileName = originalBook?.EpubFileName;
+                viewModel.ExistingBookUrl = originalBook?.BookUrl;
+                viewModel.IsPublic = originalBook?.IsPublic ?? true;
+                return View(viewModel);
             }
-             catch (Exception) // Catch potential exceptions during file IO or DB save
-            {
-                 // Log the exception
-                 // E.g., _logger.LogError(ex, "Error updating book with ID {BookId}.", id);
-
-                 // IMPORTANT: Attempt to rollback file changes if the DB update failed
-                 // If a new cover was uploaded, but DB failed, delete the new cover
-                 DeleteFile(uploadedCoverPath);
-                 // If a new epub was uploaded, but DB failed, delete the new epub
-                 DeleteFile(uploadedEpubPath);
-                 // (We don't restore the old files automatically here, that's more complex)
-
-                 ModelState.AddModelError("", "An unexpected error occurred while saving the book. Please try again.");
-                 viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
-                 // Ensure Existing... properties are still correct for redisplay
-                 viewModel.ExistingCoverUrl = book?.CoverImageUrl ?? oldCoverPath; // Use value from potentially partially updated entity or original
-                 viewModel.ExistingEpubFileName = book?.EpubFileName;
-                 viewModel.ExistingBookUrl = book?.BookUrl;
-
-                 return View(viewModel);
-             }
         }
-
 
         // GET: Books/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null) return NotFound();
-
-            var book = await _context.Books
-                .Include(b => b.User) // Include user to display who added it, if desired
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (book == null) return NotFound();
-
-            // Authorization Check
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-             if (book.UserId != currentUserId && !User.IsInRole("Admin"))
+             if (id == null) return NotFound();
+             var book = await _context.Books.Include(b => b.User).FirstOrDefaultAsync(m => m.Id == id);
+             if (book == null) return NotFound();
+             if (!IsUserAuthorized(book.UserId))
              {
-                 return Forbid();
+                 TempData["ErrorMessage"] = "You are not authorized to delete this book.";
+                 return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
              }
-
-            return View(book); // Pass the Book model to the Delete confirmation view
+             return View(book);
         }
 
         // POST: Books/Delete/5
@@ -415,142 +262,140 @@ namespace MvcBooks.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var book = await _context.Books.FindAsync(id); // Find book by ID
-
+            var book = await _context.Books.FindAsync(id);
             if (book == null) return NotFound();
+            if (!IsUserAuthorized(book.UserId)) return Forbid();
 
-            // Authorization Check
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-             if (book.UserId != currentUserId && !User.IsInRole("Admin"))
-             {
-                 return Forbid();
-             }
-
-            // Store paths before removing the entity
             string? coverPath = book.CoverImageUrl;
             string? epubPath = book.EpubFilePath;
+            string bookTitle = book.Title;
 
             try
             {
                 _context.Books.Remove(book);
                 await _context.SaveChangesAsync();
-
-                // Delete physical files *after* successful DB deletion
                 DeleteFile(coverPath);
-                DeleteFile(epubPath); // Only deletes if EpubFilePath was set
-
-                 // Consider adding a success message (TempData)
-                return RedirectToAction(nameof(Index));
+                DeleteFile(epubPath);
+                TempData["SuccessMessage"] = $"Book '{bookTitle}' deleted successfully.";
+                return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                 // Log error
-                 // E.g., _logger.LogError(ex, "Error deleting book with ID {BookId}.", id);
-                // Maybe add a model error or TempData message
-                 ModelState.AddModelError("", "An error occurred while deleting the book.");
-                 // It's tricky to redisplay the Delete confirmation view meaningfully here.
-                 // Maybe redirect back to details or index with an error message.
-                 TempData["ErrorMessage"] = "Could not delete the book due to an error.";
-                 return RedirectToAction(nameof(Index));
+                Console.WriteLine($"Error deleting book {id}: {ex.Message}");
+                TempData["ErrorMessage"] = $"Could not delete the book '{bookTitle}' due to an error. Please try again.";
+                return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
             }
         }
 
-
-        // GET: Books/Read/5 - View for the EPUB Reader
+        // GET: Books/Read/5
         [AllowAnonymous]
         public async Task<IActionResult> Read(int? id)
         {
-            if (id == null) return NotFound();
-
-            var book = await _context.Books.FindAsync(id);
-
-            if (book == null) return NotFound();
-
-            // Check if there's a source to read from
-            if (string.IsNullOrEmpty(book.EpubFilePath) && string.IsNullOrEmpty(book.BookUrl))
-            {
-                 // Maybe redirect to Details view with a message?
-                 TempData["ErrorMessage"] = "No readable content (EPUB file or URL) found for this book.";
+             if (id == null) return NotFound();
+             var book = await _context.Books.FindAsync(id);
+             if (book == null) return NotFound();
+             // Optional access check
+             // if (!book.IsPublic && !IsUserAuthorized(book.UserId)) return Forbid();
+             if (string.IsNullOrEmpty(book.EpubFilePath) && string.IsNullOrEmpty(book.BookUrl))
+             {
+                 TempData["ErrorMessage"] = "No readable content found for this book.";
                  return RedirectToAction(nameof(Details), new { id = id });
-                // Or return a specific "NotFound" view for reading content:
-                // return View("NoContentFound", book);
-            }
-
-            // Pass the book model to the Read view, which will decide how to load epub.js
-            return View(book);
+             }
+             return View(book);
         }
 
-        // GET: Books/GetEpub/5 - Action to serve the uploaded EPUB file content
+        // GET: Books/GetEpub/5
         [AllowAnonymous]
         public async Task<IActionResult> GetEpub(int id)
         {
             var book = await _context.Books.FindAsync(id);
-
-            // Only serve if EpubFilePath exists and is not empty
-            if (book == null || string.IsNullOrEmpty(book.EpubFilePath))
-            {
-                return NotFound("EPUB file not found or not specified for this book.");
-            }
-
-            string epubPath = GetAbsolutePath(book.EpubFilePath.TrimStart('/'));
-            if (!System.IO.File.Exists(epubPath))
-            {
-                // Log this inconsistency?
-                return NotFound($"EPUB file not found at specified path: {book.EpubFilePath}");
-            }
-
+            if (book == null || string.IsNullOrEmpty(book.EpubFilePath)) { return NotFound(); }
+            // Optional access check
+            // if (!book.IsPublic && !IsUserAuthorized(book.UserId)) return Forbid();
+            string epubPath = GetAbsolutePath(book.EpubFilePath.TrimStart('/')); // *** USE GetAbsolutePath ***
+            if (!System.IO.File.Exists(epubPath)) { return NotFound(); }
             try
             {
-                 var fileBytes = await System.IO.File.ReadAllBytesAsync(epubPath);
-                 // Use the stored original filename if available, otherwise a generic name
-                 string downloadName = book.EpubFileName ?? $"book_{book.Id}.epub";
-                 return File(fileBytes, "application/epub+zip", downloadName);
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(epubPath);
+                return File(fileBytes, "application/epub+zip");
             }
-            catch (IOException)
+            catch (IOException) { /* ... error handling ... */ return StatusCode(500); }
+        }
+
+        // --- Helper Methods ---
+
+        // *** FIX: Added GetAbsolutePath back ***
+        private string GetAbsolutePath(string relativePath)
+        {
+            // Trim leading slash if present to ensure Path.Combine works correctly from WebRootPath
+            relativePath = relativePath.TrimStart('/', '\\');
+            return Path.Combine(_hostEnvironment.WebRootPath, relativePath);
+        }
+
+        private async Task<string?> SaveFileAsync(IFormFile file, string folderPath, string? ensureExtension = null)
+        {
+            // Note: Null check happened before calling this, so 'file' is assumed non-null here.
+            string targetFolder = Path.Combine(_hostEnvironment.WebRootPath, folderPath);
+            Directory.CreateDirectory(targetFolder);
+
+            string extension = Path.GetExtension(file.FileName);
+            if (ensureExtension != null && !extension.Equals(ensureExtension, StringComparison.OrdinalIgnoreCase))
             {
-                // Log error reading file
-                 return StatusCode(StatusCodes.Status500InternalServerError, "Error reading EPUB file.");
+                extension = ensureExtension;
+            }
+
+            string uniqueFileNameBase = Guid.NewGuid().ToString();
+            string uniqueFileName = uniqueFileNameBase + extension;
+            string absoluteFilePath = Path.Combine(targetFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(absoluteFilePath, FileMode.Create))
+            {
+                await file.CopyToAsync(fileStream);
+            }
+            return $"/{folderPath.Replace(Path.DirectorySeparatorChar, '/')}/{uniqueFileName}";
+        }
+
+        private async Task UpdateBookCategoriesAsync(Book book, List<int>? selectedCategoryIds)
+        {
+            book.Categories ??= new List<Category>();
+            if (selectedCategoryIds == null || !selectedCategoryIds.Any()) { book.Categories.Clear(); return; }
+            var selectedIdsSet = new HashSet<int>(selectedCategoryIds);
+            var currentIdsSet = new HashSet<int>(book.Categories.Select(c => c.Id));
+            var categoriesToRemove = book.Categories.Where(c => !selectedIdsSet.Contains(c.Id)).ToList();
+            foreach (var cat in categoriesToRemove) { book.Categories.Remove(cat); }
+            var idsToAdd = selectedIdsSet.Where(id => !currentIdsSet.Contains(id)).ToList();
+            if (idsToAdd.Any())
+            {
+                var catsToAdd = await _context.Categories.Where(c => idsToAdd.Contains(c.Id)).ToListAsync();
+                foreach (var cat in catsToAdd) { book.Categories.Add(cat); }
             }
         }
 
-
-        // Helper method to update categories for a book
-        private async Task UpdateBookCategories(Book book, List<int>? selectedCategoryIds)
+        private bool IsUserAuthorized(string? resourceOwnerUserId)
         {
-             // If the book is being created, Categories collection is initially empty.
-             // If editing, book.Categories holds the currently associated categories (if included).
-
-             if (selectedCategoryIds == null)
-             {
-                 book.Categories.Clear(); // Remove all categories if none selected
-                 return;
-             }
-
-             var selectedIdsSet = new HashSet<int>(selectedCategoryIds);
-             var currentIdsSet = new HashSet<int>(book.Categories.Select(c => c.Id));
-
-             // Find categories to remove
-             var categoriesToRemove = book.Categories.Where(c => !selectedIdsSet.Contains(c.Id)).ToList();
-             foreach (var categoryToRemove in categoriesToRemove)
-             {
-                 book.Categories.Remove(categoryToRemove);
-             }
-
-             // Find category IDs to add
-             var idsToAdd = selectedIdsSet.Where(id => !currentIdsSet.Contains(id)).ToList();
-             if (idsToAdd.Any())
-             {
-                var categoriesToAdd = await _context.Categories.Where(c => idsToAdd.Contains(c.Id)).ToListAsync();
-                foreach (var categoryToAdd in categoriesToAdd)
-                {
-                     book.Categories.Add(categoryToAdd);
-                }
-             }
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return (resourceOwnerUserId != null && resourceOwnerUserId == currentUserId) || User.IsInRole("Admin");
         }
 
         private bool BookExists(int id)
         {
             return _context.Books.Any(e => e.Id == id);
+        }
+
+        private void DeleteFile(string? relativePath)
+        {
+            if (!string.IsNullOrEmpty(relativePath))
+            {
+                try
+                {
+                    string absolutePath = GetAbsolutePath(relativePath); // Use helper method
+                    if (System.IO.File.Exists(absolutePath))
+                    {
+                        System.IO.File.Delete(absolutePath);
+                    }
+                }
+                catch (Exception ex) { Console.WriteLine($"Warning: Could not delete file {relativePath}. Error: {ex.Message}"); }
+            }
         }
     }
 }
