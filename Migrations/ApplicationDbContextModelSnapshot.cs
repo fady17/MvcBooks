@@ -191,8 +191,8 @@ namespace MvcBooks.Migrations
                         .HasColumnType("nvarchar(2048)");
 
                     b.Property<string>("CoverImageUrl")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Description")
                         .HasMaxLength(500)
@@ -208,6 +208,14 @@ namespace MvcBooks.Migrations
 
                     b.Property<bool>("IsPublic")
                         .HasColumnType("bit");
+
+                    b.Property<string>("PdfFileName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PdfFilePath")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("PublishedDate")
                         .HasColumnType("datetime2");

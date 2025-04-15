@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic; 
 namespace MvcBooks.Models.ViewModels
 {
     public class BookViewModel
@@ -52,6 +53,12 @@ namespace MvcBooks.Models.ViewModels
         [StringLength(2048)]
         [Url(ErrorMessage = "Please enter a valid URL (e.g., https://example.com/book.epub)")]
         public string? BookUrl { get; set; } 
+
+         [Display(Name = "OR Upload PDF File")]
+        public IFormFile? PdfFile { get; set; } 
+
+        [Display(Name = "Current PDF File")]
+        public string? ExistingPdfFileName { get; set; }
 
         [Display(Name = "Make Publicly Visible on Home Page?")]
         public bool IsPublic { get; set; } = true; 

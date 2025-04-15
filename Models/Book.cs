@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Collections.Generic;
 
 namespace MvcBooks.Models
 {
@@ -15,7 +16,7 @@ namespace MvcBooks.Models
         [StringLength(500)]
         public string? Description { get; set; }
         
-        [StringLength(200)]
+        [StringLength(255)]
         public string? CoverImageUrl { get; set; }
         
         [DataType(DataType.Date)]
@@ -41,7 +42,11 @@ namespace MvcBooks.Models
         [StringLength(100)] 
         public string? EpubFileName { get; set; }
 
-       
+        [StringLength(255)]
+        public string? PdfFilePath { get; set; }
+
+        [StringLength(100)]
+        public string? PdfFileName { get; set; }       
 
         [StringLength(2048)] 
         [Url] 

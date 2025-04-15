@@ -1,2 +1,2 @@
 # MvcBooks
-![erd](./images/erdiagram.png)
+![erd](./wwwroot/images/erdiagram.png)

@@ -1,166 +1,101 @@
 @model MvcBooks.Models.ViewModels.BookViewModel
 
-@{
-    ViewData["Title"] = "Edit Book - " + Model.Title;
-}
+@{ ViewData["Title"] = "Edit Book - " + Model.Title; }
 
-<h1>Edit Book</h1>
-<h4>@Model.Title</h4>
-<hr />
-
-<div class="row">
-    <div class="col-md-8">
-        <form asp-action="Edit" method="post" enctype="multipart/form-data">
-
-            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="ExistingCoverUrl" />
-            <input type="hidden" asp-for="ExistingEpubFileName" />
-            <input type="hidden" asp-for="ExistingBookUrl" />
-
-
-            @* --- Basic Book Details --- *@
-            <div class="mb-3">
-                <label asp-for="Title" class="form-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+<div class="row justify-content-center">
+    <div class="col-lg-10 col-xl-8">
+        <div class="card auth-card shadow-sm mb-4">
+            <div class="card-header bg-light py-3">
+                <h4 class="mb-0 auth-title">Edit Book: @Model.Title</h4>
             </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="ExistingCoverUrl" />
+                    <input type="hidden" asp-for="ExistingEpubFileName" />
+                    <input type="hidden" asp-for="ExistingPdfFileName" />
+                    <input type="hidden" asp-for="ExistingBookUrl" />
 
-            <div class="mb-3">
-                <label asp-for="Author" class="form-label"></label>
-                <input asp-for="Author" class="form-control" />
-                <span asp-validation-for="Author" class="text-danger"></span>
-            </div>
+                    <h5 class="form-section-header mb-3">Book Details</h5>
+                     <div class="row">
+                         <div class="col-md-6 mb-3"> <label asp-for="Title" class="form-label"></label> <input asp-for="Title" class="form-control" /> <span asp-validation-for="Title" class="text-danger"></span> </div>
+                         <div class="col-md-6 mb-3"> <label asp-for="Author" class="form-label"></label> <input asp-for="Author" class="form-control" /> <span asp-validation-for="Author" class="text-danger"></span> </div>
+                     </div>
+                     <div class="mb-3"> <label asp-for="Description" class="form-label"></label> <textarea asp-for="Description" class="form-control" rows="4"></textarea> <span asp-validation-for="Description" class="text-danger"></span> </div>
+                     <div class="row">
+                         <div class="col-md-6 mb-3"> <label asp-for="PublishedDate" class="form-label"></label> <input asp-for="PublishedDate" type="date" class="form-control" /> <span asp-validation-for="PublishedDate" class="text-danger"></span> </div>
+                         <div class="col-md-6 mb-3">
+                             @if (!string.IsNullOrEmpty(Model.ExistingCoverUrl)){ <div class="mb-1"><label class="form-label small">Current Cover:</label><br/><img src="@Model.ExistingCoverUrl" alt="Current Cover" class="img-thumbnail" style="max-height: 80px;" /></div> }
+                             <label asp-for="CoverImage" class="form-label"><i class="fas fa-image"></i> Upload New Cover (Optional)</label> <input asp-for="CoverImage" type="file" accept="image/*" class="form-control" /> <span asp-validation-for="CoverImage" class="text-danger"></span>
+                         </div>
+                     </div>
 
-            <div class="mb-3">
-                <label asp-for="Description" class="form-label"></label>
-                <textarea asp-for="Description" class="form-control" rows="4"></textarea>
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
+                    <h5 class="form-section-header mb-3">Book Content Source</h5>
+                    <p class="text-muted mb-3"><small>Optionally provide a new EPUB, PDF, or URL below to replace the current source. Leave all empty to keep the existing source.</small></p>
 
-            <div class="mb-3">
-                <label asp-for="PublishedDate" class="form-label"></label>
-                <input asp-for="PublishedDate" type="date" class="form-control" />
-                <span asp-validation-for="PublishedDate" class="text-danger"></span>
-            </div>
-
-            <hr />
-            @* --- Cover Image --- *@
-            <h5 class="mb-3">Cover Image</h5>
-             @if (!string.IsNullOrEmpty(Model.ExistingCoverUrl))
-             {
-                 <div class="mb-2">
-                     <label class="form-label">Current Cover:</label><br />
-                     <img src="@Model.ExistingCoverUrl" alt="Current Cover" class="img-thumbnail" style="max-height: 150px;" />
-                 </div>
-             }
-            <div class="mb-3">
-                <label asp-for="CoverImage" class="form-label">Upload New Cover (Optional)</label>
-                <input asp-for="CoverImage" type="file" accept="image/*" class="form-control" />
-                <span asp-validation-for="CoverImage" class="text-danger"></span>
-                <small class="form-text text-muted">Select a new image file to replace the existing cover.</small>
-            </div>
-
-            <hr />
-            @* --- EPUB Source Section --- *@
-            <h5 class="mb-3">Book Content Source</h5>
-            <p class="text-muted"><small>You can optionally provide a new EPUB file or URL below to replace the current source. If you leave both empty, the existing source will be kept.</small></p>
-
-            @if (!string.IsNullOrEmpty(Model.ExistingEpubFileName))
-            {
-                <div class="mb-2">
-                     <label class="form-label">Current Source:</label>
-                     <span class="badge bg-success"><i class="fas fa-file-upload me-1"></i> Uploaded File: @Model.ExistingEpubFileName</span>
-                 </div>
-            }
-            else if(!string.IsNullOrEmpty(Model.ExistingBookUrl))
-            {
-                 <div class="mb-2">
-                     <label class="form-label">Current Source:</label>
-                     <span class="badge bg-primary"><i class="fas fa-link me-1"></i> URL: @Model.ExistingBookUrl</span>
-                 </div>
-            }
-            else
-            {
-                 <div class="mb-2 alert alert-warning py-1">No current content source found. Please provide one below.</div>
-            }
-
-            <div class="mb-3">
-                <label asp-for="EpubFile" class="form-label">Upload New EPUB File (Optional)</label>
-                <input asp-for="EpubFile" type="file" accept=".epub" class="form-control" />
-                <span asp-validation-for="EpubFile" class="text-danger"></span>
-                <small class="form-text text-muted">Select a new EPUB file to replace the current source.</small>
-            </div>
-
-            <div class="text-center my-2 fw-bold">OR</div>
-
-            <div class="mb-3">
-                <label asp-for="BookUrl" class="form-label">Enter New Book URL (Optional)</label>
-                <input asp-for="BookUrl" type="url" class="form-control" placeholder="https://example.com/path/to/book.epub" />
-                <span asp-validation-for="BookUrl" class="text-danger"></span>
-                <small class="form-text text-muted">Enter a new URL to replace the current source.</small>
-            </div>
-            <hr />
-
-            @* --- Category Selection --- *@
-            <div class="mb-3">
-                <label class="form-label">Categories</label>
-                 @if (Model.AvailableCategories == null || !Model.AvailableCategories.Any())
-                {
-                     <div class="alert alert-warning">No categories found.</div>
-                }
-                else
-                {
-                    <div class="row checkbox-list">
-                        @foreach (var category in Model.AvailableCategories.OrderBy(c => c.Name))
-                        {
-                            <div class="col-md-4 col-sm-6 mb-2">
-                                <div class="form-check">
-                                    <input type="checkbox"
-                                           name="SelectedCategoryIds" 
-                                           value="@category.Id"
-                                           id="category_@category.Id"
-                                           class="form-check-input"
-                                           @(Model.SelectedCategoryIds?.Contains(category.Id) ?? false ? "checked" : "") /> 
-                                    <label class="form-check-label" for="category_@category.Id">@category.Name</label>
-                                </div>
-                            </div>
-                        }
+                    <div class="mb-3 current-source-display">
+                         <label class="form-label">Current Source:</label>
+                         @if (!string.IsNullOrEmpty(Model.ExistingEpubFileName)) {
+                             <span class="badge bg-success"><i class="fas fa-book-open me-1"></i> EPUB: @Model.ExistingEpubFileName</span>
+                         } else if (!string.IsNullOrEmpty(Model.ExistingPdfFileName)) {
+                             <span class="badge bg-danger"><i class="fas fa-file-pdf me-1"></i> PDF: @Model.ExistingPdfFileName</span>
+                         } else if(!string.IsNullOrEmpty(Model.ExistingBookUrl)) {
+                             <span class="badge bg-primary"><i class="fas fa-link me-1"></i> URL: @Model.ExistingBookUrl</span>
+                         } else {
+                             <span class="badge bg-warning text-dark">None Provided</span>
+                         }
                     </div>
-                     <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
-                }
-            </div>
-            <hr /> @* Added separator *@
 
-            @* --- START: Added IsPublic Checkbox --- *@
-            <div class="mb-3">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" asp-for="IsPublic">
-                    <label class="form-check-label" asp-for="IsPublic"></label>
-                 </div>
-                <small class="form-text text-muted">Check this box to make the book visible on the public home page. Uncheck to keep it private to your account.</small>
-                <span asp-validation-for="IsPublic" class="text-danger"></span>
-            </div>
-            @* --- END: Added IsPublic Checkbox --- *@
+                    <div class="mb-3">
+                         <label asp-for="EpubFile" class="form-label"><i class="fas fa-book-open"></i> Upload New EPUB File (Optional)</label>
+                         <input asp-for="EpubFile" type="file" accept=".epub" class="form-control" />
+                         <span asp-validation-for="EpubFile" class="text-danger"></span>
+                    </div>
 
+                    <div class="form-divider-or">OR</div>
+                    <div class="mb-3">
+                         <label asp-for="PdfFile" class="form-label"><i class="fas fa-file-pdf"></i> Upload New PDF File (Optional)</label>
+                         <input asp-for="PdfFile" type="file" accept=".pdf,application/pdf" class="form-control" />
+                         <span asp-validation-for="PdfFile" class="text-danger"></span>
+                    </div>
 
-            @* --- Submit Button --- *@
-            <div class="form-group mt-4 mb-3">
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-save"></i> Save Changes
-                </button>
-                 @* --- Link back to MyBooks page (adjust later if needed) --- *@
-                 <a asp-area="Identity" asp-page="/Account/Manage/MyBooks" class="btn btn-outline-secondary ms-2">Cancel</a> 
-                 @* --- Temporarily link back to Home until MyBooks exists --- *@
-                 @* <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary ms-2">Cancel</a> *@
+                    <div class="form-divider-or">OR</div>
+                    <div class="mb-3">
+                         <label asp-for="BookUrl" class="form-label"><i class="fas fa-link"></i> Enter New Book URL (Optional)</label>
+                         <input asp-for="BookUrl" type="url" class="form-control" placeholder="https://example.com/path/to/book.epub" />
+                         <span asp-validation-for="BookUrl" class="text-danger"></span>
+                    </div>
+
+                    <h5 class="form-section-header mb-3">Categorization & Visibility</h5>
+                     <div class="mb-3">
+                         <label class="form-label d-block">Categories</label>
+                         @if (Model.AvailableCategories == null || !Model.AvailableCategories.Any()){ <div class="alert alert-warning py-2">No categories found.</div> }
+                         else {
+                             <div class="checkbox-list-container mb-2">
+                                 <div class="row checkbox-list">
+                                     @foreach (var category in Model.AvailableCategories.OrderBy(c => c.Name)) { <div class="col-md-4 col-sm-6 mb-2"> <div class="form-check"> <input type="checkbox" name="SelectedCategoryIds" value="@category.Id" id="category_@category.Id" class="form-check-input" @(Model.SelectedCategoryIds?.Contains(category.Id) ?? false ? "checked" : "") /> <label class="form-check-label" for="category_@category.Id">@category.Name</label> </div> </div> }
+                                 </div>
+                             </div>
+                             <span asp-validation-for="SelectedCategoryIds" class="text-danger"></span>
+                         }
+                     </div>
+                     <div class="mb-3">
+                         <div class="form-check"> <input class="form-check-input" type="checkbox" asp-for="IsPublic"> <label class="form-check-label" asp-for="IsPublic"></label> </div>
+                         <small class="form-text text-muted">Check to make public. Uncheck to keep private.</small> <span asp-validation-for="IsPublic" class="text-danger"></span>
+                     </div>
+
+                    <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                        <a asp-area="Identity" asp-page="/Account/Manage/MyBooks" class="btn btn-outline-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-themed-primary"><i class="fas fa-save me-1"></i> Save Changes</button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    @* Font Awesome link might be needed if not global *@
-    @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" /> *@
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 }

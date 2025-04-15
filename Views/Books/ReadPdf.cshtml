@@ -1,0 +1,332 @@
+@model MvcBooks.Models.Book
+@using System.Text.Json
+
+@{
+    ViewData["Title"] = "Read PDF - " + Model.Title;
+    Layout = "_Layout";
+
+    string? pdfSourceUrl = null;
+    if (!string.IsNullOrEmpty(Model.PdfFilePath)) {
+        pdfSourceUrl = Url.Action("GetPdf", "Books", new { id = Model.Id });
+    }
+    // Optional: Handle external PDF URL
+    // else if (!string.IsNullOrEmpty(Model.BookUrl) && Model.BookUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) {
+    //    pdfSourceUrl = Model.BookUrl;
+    // }
+}
+
+@section Styles {
+    <style>
+        html, body { height: 100%; overflow: hidden; background-color: #525659; }
+        main[role="main"] { height: calc(100vh - 56px - 60px); padding: 0 !important; margin: 0 !important; position: relative; }
+        .container { max-width: 100% !important; height: 100%; padding: 0 !important; }
+
+        #pdf-viewer-area { width: 100%; height: 100%; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+
+        #viewer-container {
+            flex-grow: 1; /* Take remaining vertical space */
+            overflow: auto;
+            text-align: center;
+            padding: 10px 0;
+            background-color: #525659; /* Default background */
+            transition: background-color 0.3s ease;
+        }
+        #viewer-container.dark-mode {
+            background-color: #212529; /* Darker background */
+        }
+        #viewer-container.dark-mode #the-canvas {
+             /* Optional: Invert canvas colors in dark mode - can be complex */
+             /* filter: invert(1) hue-rotate(180deg); */
+             border-color: #444;
+        }
+
+
+        #the-canvas {
+            display: block;
+            margin: 10px auto; /* Add vertical margin too */
+            border: 1px solid black;
+            direction: ltr;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5); /* Add shadow */
+        }
+
+        #pdf-viewer-controls {
+            flex-shrink: 0; /* Prevent controls from shrinking */
+            background-color: rgba(50, 54, 57, 0.95);
+            padding: 6px 15px; /* Slightly less padding */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 15;
+            border-top: 1px solid #6c757d;
+            color: #fff;
+            gap: 10px; /* Add space between control groups */
+        }
+        #pdf-viewer-controls .btn,
+        #pdf-viewer-controls .form-control,
+        #pdf-viewer-controls .input-group-text {
+             height: calc(1.5em + 0.5rem + 2px); /* Match btn-sm height */
+             padding: 0.25rem 0.5rem;
+             font-size: 0.875rem;
+        }
+        #pdf-viewer-controls button { color: #fff; border-color: #6c757d; }
+        #pdf-viewer-controls button:hover { background-color: #6c757d; }
+        #pdf-viewer-controls button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #page-num-controls { display: flex; align-items: center; }
+        #page-num-input {
+             width: 55px; /* Fixed width for page input */
+             text-align: center;
+             border-radius: 0; /* Square off edges inside group */
+             -moz-appearance: textfield; /* Hide spinners in Firefox */
+        }
+         #page-num-input::-webkit-outer-spin-button,
+         #page-num-input::-webkit-inner-spin-button { /* Hide spinners in Chrome/Safari */
+             -webkit-appearance: none;
+             margin: 0;
+         }
+        #page-num-total {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            background-color: #495057; /* Darker background for total pages */
+            border: 1px solid #6c757d;
+            border-left: 0; /* Remove left border next to input */
+            border-radius: 0 0.25rem 0.25rem 0; /* Adjust radius */
+        }
+        #zoom-controls { display: flex; align-items: center; }
+        #zoom-display { padding: 0.25rem 0.75rem; min-width: 60px; text-align: center; }
+        #theme-toggle-btn { margin-left: auto; } /* Push theme toggle right */
+
+        .pdf-loading-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.1rem; color: #fff; background-color: rgba(0, 0, 0, 0.7); padding: 20px 30px; border-radius: 8px; z-index: 20; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .pdf-loading-message.hidden { display: none; }
+    </style>
+}
+
+@if (pdfSourceUrl != null)
+{
+    <div id="pdf-viewer-area">
+        <div id="viewer-container">
+            <canvas id="the-canvas"></canvas>
+        </div>
+
+        <div id="pdf-viewer-controls">
+            @* Paging Controls *@
+            <button id="prev-page-btn" class="btn btn-sm btn-outline-light" aria-label="Previous Page" title="Previous Page (Left Arrow)"><i class="fas fa-arrow-left"></i></button>
+            <div id="page-num-controls" class="input-group input-group-sm">
+                <input type="number" id="page-num-input" class="form-control form-control-sm" aria-label="Current Page Number" min="1">
+                <span class="input-group-text" id="page-num-total">/ ?</span>
+            </div>
+            <button id="next-page-btn" class="btn btn-sm btn-outline-light" aria-label="Next Page" title="Next Page (Right Arrow)"><i class="fas fa-arrow-right"></i></button>
+
+            @* Zoom Controls *@
+            <div id="zoom-controls" class="ms-3">
+                <button id="zoom-out-btn" class="btn btn-sm btn-outline-light" aria-label="Zoom Out" title="Zoom Out (Ctrl+Scroll Down)"><i class="fas fa-search-minus"></i></button>
+                <span id="zoom-display" class="mx-1" title="Current Zoom Level">100%</span>
+                <button id="zoom-in-btn" class="btn btn-sm btn-outline-light" aria-label="Zoom In" title="Zoom In (Ctrl+Scroll Up)"><i class="fas fa-search-plus"></i></button>
+            </div>
+
+            @* Theme Toggle Button - pushed right by CSS/flex spacer if needed *@
+            <button id="theme-toggle-btn" class="btn btn-sm btn-outline-light" aria-label="Toggle Dark/Light Theme" title="Toggle Dark/Light Theme">
+                 <i class="fas fa-moon"></i> @* Initial icon is moon (for switching to dark) *@
+            </button>
+        </div>
+
+        <div id="loading-indicator" class="pdf-loading-message" role="status" aria-live="polite">
+             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Loading PDF...
+        </div>
+    </div>
+}
+else
+{
+     <div class="alert alert-warning m-4">
+         Could not find the PDF source for this book.
+         <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-link btn-sm mt-1">Back to Details</a>
+     </div>
+}
+
+@section Scripts {
+    @if (pdfSourceUrl != null)
+    {
+        <script src="~/lib/pdfjs/build/pdf.mjs" type="module"></script>
+        <script type="module">
+            pdfjsLib.GlobalWorkerOptions.workerSrc = '/lib/pdfjs/build/pdf.worker.mjs';
+
+            // --- Get Elements (Checked once) ---
+            const canvas = document.getElementById('the-canvas');
+            const viewerContainer = document.getElementById('viewer-container');
+            const pageNumDisplayInput = document.getElementById('page-num-input');
+            const pageNumTotalSpan = document.getElementById('page-num-total');
+            const prevButton = document.getElementById('prev-page-btn');
+            const nextButton = document.getElementById('next-page-btn');
+            const zoomInButton = document.getElementById('zoom-in-btn');
+            const zoomOutButton = document.getElementById('zoom-out-btn');
+            const zoomDisplay = document.getElementById('zoom-display');
+            const themeToggleButton = document.getElementById('theme-toggle-btn');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const ctx = canvas?.getContext('2d');
+
+            // --- Initial Checks ---
+            if (!canvas || !ctx || !pageNumDisplayInput || !pageNumTotalSpan || !prevButton || !nextButton || !zoomInButton || !zoomOutButton || !zoomDisplay || !themeToggleButton || !loadingIndicator || !viewerContainer) {
+                console.error("PDF viewer elements initialization failed. One or more elements not found.");
+                alert("Error initializing PDF viewer. Essential page elements are missing.");
+                // --- FIX: Removed illegal 'return' statement ---
+                // return;
+            } else {
+                // --- State Variables ---
+                let pdfDoc = null;
+                let pageNum = 1;
+                let pageRendering = false;
+                let pageNumPending = null;
+                let currentScale = 1.0;
+                const MAX_SCALE = 3.0;
+                const MIN_SCALE = 0.25;
+                const ZOOM_INCREMENT = 0.25;
+
+                // --- Rendering Function ---
+                const renderPage = async (num) => {
+                     pageRendering = true;
+                     loadingIndicator?.classList.remove('hidden');
+                     updateNavButtons();
+
+                     try {
+                        const page = await pdfDoc.getPage(num);
+                        const viewport = page.getViewport({ scale: currentScale });
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+                        const renderContext = { canvasContext: ctx, viewport: viewport };
+                        await page.render(renderContext).promise;
+
+                        pageRendering = false;
+                        loadingIndicator?.classList.add('hidden');
+
+                        if (pageNumPending !== null) {
+                            renderPage(pageNumPending);
+                            pageNumPending = null;
+                        }
+                     } catch(err) {
+                         console.error("Render error:", err);
+                         pageRendering = false;
+                         loadingIndicator?.classList.add('hidden');
+                         alert(`Error rendering page ${num}: ${err?.message || err}`);
+                     }
+                 };
+
+                const queueRenderPage = num => {
+                    if (pageRendering) { pageNumPending = num; }
+                    else { renderPage(num); }
+                };
+
+                // --- Navigation ---
+                const onPrevPage = () => { if (!pdfDoc || pageNum <= 1) return; pageNum--; queueRenderPage(pageNum); };
+                const onNextPage = () => { if (!pdfDoc || pageNum >= pdfDoc.numPages) return; pageNum++; queueRenderPage(pageNum); };
+
+                const goToPage = (targetPageNum) => {
+                     if (!pdfDoc) return; // Guard against race condition
+                     if (targetPageNum >= 1 && targetPageNum <= pdfDoc.numPages) {
+                         pageNum = targetPageNum;
+                         queueRenderPage(pageNum);
+                     } else {
+                        pageNumDisplayInput.value = pageNum; // Reset input
+                        console.warn("Invalid page number entered:", targetPageNum);
+                     }
+                };
+
+                const updateNavButtons = () => {
+                    if (!pdfDoc) { // Ensure doc is loaded before accessing numPages
+                        pageNumDisplayInput.value = '';
+                        pageNumTotalSpan.textContent = `/ ?`;
+                        prevButton.disabled = true;
+                        nextButton.disabled = true;
+                        zoomOutButton.disabled = true;
+                        zoomInButton.disabled = true;
+                        return;
+                    };
+                    pageNumDisplayInput.value = pageNum;
+                    pageNumTotalSpan.textContent = `/ ${pdfDoc.numPages}`;
+                    prevButton.disabled = (pageNum <= 1);
+                    nextButton.disabled = (pageNum >= pdfDoc.numPages);
+                    zoomOutButton.disabled = (currentScale <= MIN_SCALE);
+                    zoomInButton.disabled = (currentScale >= MAX_SCALE);
+                };
+
+                // --- Zoom ---
+                const updateZoomDisplay = () => {
+                    zoomDisplay.textContent = `${Math.round(currentScale * 100)}%`;
+                };
+
+                const zoomInOut = (direction) => {
+                     let newScale = currentScale + (direction * ZOOM_INCREMENT);
+                     newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale));
+                     if (newScale !== currentScale) {
+                         currentScale = newScale;
+                         queueRenderPage(pageNum); // Re-render
+                         updateZoomDisplay();
+                     }
+                 };
+
+                // --- Theme Toggle ---
+                const toggleTheme = () => {
+                     viewerContainer.classList.toggle('dark-mode');
+                     const isDarkMode = viewerContainer.classList.contains('dark-mode');
+                     themeToggleButton.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+                     themeToggleButton.setAttribute('aria-label', isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme');
+                };
+
+                // --- Event Listeners ---
+                prevButton.addEventListener('click', onPrevPage);
+                nextButton.addEventListener('click', onNextPage);
+                zoomInButton.addEventListener('click', () => zoomInOut(1));
+                zoomOutButton.addEventListener('click', () => zoomInOut(-1));
+                themeToggleButton.addEventListener('click', toggleTheme);
+
+                pageNumDisplayInput.addEventListener('change', (e) => {
+                     const targetPage = parseInt(e.target.value, 10);
+                     if (!isNaN(targetPage)) { goToPage(targetPage); }
+                     else { e.target.value = pageNum; }
+                });
+                pageNumDisplayInput.addEventListener('keypress', (e) => {
+                     if (e.key === 'Enter') { pageNumDisplayInput.dispatchEvent(new Event('change')); e.preventDefault(); }
+                });
+
+                document.addEventListener('keydown', (e) => {
+                     if (e.target.tagName === 'INPUT') return;
+                     if (e.key === "ArrowLeft") { onPrevPage(); e.preventDefault(); }
+                     if (e.key === "ArrowRight") { onNextPage(); e.preventDefault(); }
+                });
+
+                viewerContainer.addEventListener('wheel', (e) => {
+                     if (e.ctrlKey || e.metaKey) {
+                         e.preventDefault();
+                         const direction = e.deltaY < 0 ? 1 : -1;
+                         zoomInOut(direction);
+                     }
+                }, { passive: false });
+
+                // --- Initial PDF Load ---
+                const pdfUrlJson = @Html.Raw(Json.Serialize(pdfSourceUrl));
+                const pdfUrl = pdfUrlJson || "";
+
+                if (pdfUrl) {
+                    loadingIndicator.classList.remove('hidden');
+                    pdfjsLib.getDocument(pdfUrl).promise.then(_pdfDoc => {
+                        pdfDoc = _pdfDoc;
+                        pageNumDisplayInput.max = pdfDoc.numPages; // Set input max value
+                        updateZoomDisplay();
+                        updateNavButtons(); // Update buttons based on initial state
+                        renderPage(pageNum); // Render initial page
+                    }, reason => {
+                        console.error("PDF Load Error:", reason);
+                        if(loadingIndicator) loadingIndicator.textContent = 'Error loading PDF.';
+                        alert(`Error loading PDF: ${reason?.message || reason}`);
+                    });
+                } else {
+                     console.error("PDF URL missing after JSON processing.");
+                     if(loadingIndicator) {
+                         loadingIndicator.textContent = 'Error: PDF source URL not available.';
+                         loadingIndicator.classList.remove('hidden');
+                     }
+                }
+            } // End else block for initial element check
+        </script>
+    }
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+}

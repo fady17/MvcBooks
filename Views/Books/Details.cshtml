@@ -1,19 +1,16 @@
 @model MvcBooks.Models.Book
-@* --- ADDED --- *@
-@using Microsoft.AspNetCore.Identity 
-@using MvcBooks.Models 
+@using Microsoft.AspNetCore.Identity
+@using MvcBooks.Models
 @inject UserManager<User> UserManager
 @inject SignInManager<User> SignInManager
-@* ------------- *@
 
 @{
-    ViewData["Title"] = Model.Title; 
+    ViewData["Title"] = Model.Title;
 }
 
 <h2>Book Details</h2>
 <hr />
 
-@* Display TempData messages if redirected here with one *@
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -31,33 +28,42 @@
 
 
 <div class="row">
-    @* Column for Cover Image *@
     <div class="col-md-4 mb-3 text-center">
         <img src="@(string.IsNullOrEmpty(Model.CoverImageUrl) ? "/images/placeholder-cover.png" : Model.CoverImageUrl)"
              alt="Cover for @Model.Title"
-             class="img-fluid rounded shadow-sm" 
+             class="img-fluid rounded shadow-sm"
              style="max-height: 500px;"
              onerror="this.onerror=null; this.src='/images/placeholder-cover.png';" />
 
-        @* --- Read Button --- *@
-        <div class="mt-3 d-grid"> 
-            @if (!string.IsNullOrEmpty(Model.EpubFilePath) || !string.IsNullOrEmpty(Model.BookUrl))
-            {
-                <a asp-action="Read" asp-route-id="@Model.Id" class="btn btn-success btn-lg">
-                    <i class="fas fa-book-open"></i> Read Book
-                </a>
-            }
-            else
-            {
-                 <button type="button" class="btn btn-secondary btn-lg disabled" aria-disabled="true">
-                    <i class="fas fa-times-circle"></i> No Readable Content
-                 </button>
-                 <small class="text-muted mt-1">No EPUB file or valid URL available.</small>
-            }
-        </div>
+      <div class="mt-3 d-grid">
+          @if (!string.IsNullOrEmpty(Model.PdfFilePath))
+          {
+              <a asp-action="ReadPdf" asp-route-id="@Model.Id" class="btn btn-danger btn-lg">
+                  <i class="fas fa-file-pdf"></i> Read PDF
+              </a>
+          }
+          else if (!string.IsNullOrEmpty(Model.EpubFilePath) || (!string.IsNullOrEmpty(Model.BookUrl) && !Model.BookUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)))
+          {
+               <a asp-action="Read" asp-route-id="@Model.Id" class="btn btn-success btn-lg">
+                  <i class="fas fa-book-open"></i> Read EPUB/Link
+              </a>
+          }
+           else if (!string.IsNullOrEmpty(Model.BookUrl) && Model.BookUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+           {
+                <a asp-action="ReadPdf" asp-route-id="@Model.Id" class="btn btn-danger btn-lg">
+                      <i class="fas fa-file-pdf"></i> Read PDF (URL)
+                 </a>
+           }
+          else
+          {
+              <button type="button" class="btn btn-secondary btn-lg disabled" aria-disabled="true">
+                  <i class="fas fa-times-circle"></i> No Readable Content
+              </button>
+              <small class="text-muted mt-1">No EPUB or PDF file/link available.</small>
+          }
+      </div>
     </div>
 
-    @* Column for Book Information *@
     <div class="col-md-8 mb-3">
         <h3>@Html.DisplayFor(model => model.Title)</h3>
         @if (!string.IsNullOrWhiteSpace(Model.Author))
@@ -65,12 +71,12 @@
             <h5 class="text-muted mb-3">by @Html.DisplayFor(model => model.Author)</h5>
         }
 
-        <dl class="row dl-horizontal"> 
+        <dl class="row dl-horizontal">
             <dt class="col-sm-3">Description</dt>
             <dd class="col-sm-9">
                 @if (!string.IsNullOrWhiteSpace(Model.Description))
                 {
-                    @Html.Raw(System.Text.RegularExpressions.Regex.Replace(Html.Encode(Model.Description), @"\n", "<br />")) @* Render line breaks *@
+                    @Html.Raw(System.Text.RegularExpressions.Regex.Replace(Html.Encode(Model.Description), @"\n", "<br />"))
                 }
                 else
                 {
@@ -100,12 +106,17 @@
              <dd class="col-sm-9">
                  @if (!string.IsNullOrEmpty(Model.EpubFilePath))
                  {
-                     <span>Uploaded File: @(Model.EpubFileName ?? "EPUB File")</span>
+                     <span><i class="fas fa-book-open me-1 text-success"></i> Uploaded EPUB: @(Model.EpubFileName ?? "EPUB File")</span>
                      <a asp-action="GetEpub" asp-route-id="@Model.Id" class="ms-2 small" title="Download EPUB"><i class="fas fa-download"></i> Download</a>
+                 }
+                 else if (!string.IsNullOrEmpty(Model.PdfFilePath))
+                 {
+                     <span><i class="fas fa-file-pdf me-1 text-danger"></i> Uploaded PDF: @(Model.PdfFileName ?? "PDF File")</span>
+                     <a asp-action="GetPdf" asp-route-id="@Model.Id" class="ms-2 small" title="Download PDF"><i class="fas fa-download"></i> Download</a>
                  }
                  else if (!string.IsNullOrEmpty(Model.BookUrl))
                  {
-                     <span>External URL: <a href="@Model.BookUrl" target="_blank" rel="noopener noreferrer">@Model.BookUrl</a></span>
+                     <span><i class="fas fa-link me-1 text-primary"></i> External URL: <a href="@Model.BookUrl" target="_blank" rel="noopener noreferrer">@Model.BookUrl</a></span>
                  }
                  else
                  {
@@ -113,53 +124,28 @@
                  }
              </dd>
 
-            <dt class="col-sm-3">Added By</dt>
-            <dd class="col-sm-9">@(Model.User?.UserName ?? "N/A")</dd> 
-
-            <dt class="col-sm-3">Visibility</dt>
-             <dd class="col-sm-9">
-                 @if(Model.IsPublic)
-                 {
-                     <span class="badge bg-success"><i class="fas fa-eye me-1"></i> Public</span>
-                 }
-                 else
-                 {
-                      <span class="badge bg-secondary"><i class="fas fa-lock me-1"></i> Private</span>
-                 }
-             </dd>
-
+              <dt class="col-sm-3">Added By</dt><dd class="col-sm-9">@(Model.User?.UserName ?? "N/A")</dd>
+              <dt class="col-sm-3">Visibility</dt><dd class="col-sm-9">@if(Model.IsPublic){<span class="badge bg-success"><i class="fas fa-eye me-1"></i> Public</span>} else {<span class="badge bg-secondary"><i class="fas fa-lock me-1"></i> Private</span>}</dd>
         </dl>
 
-         @* --- START: Modified Action Links --- *@
         <div class="mt-4">
-             @* Show Edit/Delete links ONLY if user is signed in AND owns the book *@
              @if (SignInManager.IsSignedIn(User))
              {
                  var currentUserId = UserManager.GetUserId(User);
-                 @if (Model.UserId != null && Model.UserId == currentUserId) 
+                 @if (Model.UserId != null && Model.UserId == currentUserId)
                  {
-                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning"> @* Changed Edit to Warning color *@
+                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
                          <i class="fas fa-edit"></i> Edit
                      </a>
                     <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger ms-2">
                         <i class="fas fa-trash-alt"></i> Delete
                     </a>
                  }
-                 @* Optional: Add Admin check here if Admins can also edit/delete *@
-                 @* else if(User.IsInRole("Admin")) { ... Admin Buttons ... } *@
              }
-             
-             @* Removed the "Back to List" button *@
-             @* <a asp-action="Index" class="btn btn-outline-secondary ms-2"> *@
-             @*     <i class="fas fa-list"></i> Back to List *@
-             @* </a> *@
         </div>
-         @* --- END: Modified Action Links --- *@
-
     </div>
 </div>
 
-@* Include Font Awesome if you want icons *@
 @section Scripts {
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 }
