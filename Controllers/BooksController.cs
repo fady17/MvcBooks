@@ -495,7 +495,7 @@ namespace MvcBooks.Controllers
         private bool IsUserAuthorized(string? resourceOwnerUserId)
         {
             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            // Allow if owner OR if user has Admin role
+            
             return (resourceOwnerUserId != null && resourceOwnerUserId == currentUserId) || User.IsInRole("Admin");
         }
 
