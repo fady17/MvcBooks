@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using MvcBooks.Configuration;
 using MvcBooks.Models;
 using MvcBooks.Models.Data;
+using Minio; 
+using MvcBooks.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +27,12 @@ builder.Services.AddDefaultIdentity<User>(options =>
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages(); 
+
+builder.Services.Configure<MinioOptions>(
+    builder.Configuration.GetSection(MinioOptions.Minio) 
+);
+
+builder.Services.AddSingleton<MinioService>();
 
 var app = builder.Build();
 

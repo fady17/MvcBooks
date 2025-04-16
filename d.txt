@@ -2,3 +2,11 @@ docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Wdt.12345" \
    -p 1433:1433 --name sql1 --hostname sql1 \
    -d \
    mcr.microsoft.com/mssql/server:2022-latest
+
+
+ docker run -p 9000:9000 -p 9001:9001 \
+  -e MINIO_ROOT_USER=MvcBookCdn \
+  -e MINIO_ROOT_PASSWORD=Wdt.12345 \ 
+  -v $(pwd)/minio-data:/data \
+  --name minio \
+  minio/minio server /data --console-address ":9001"   

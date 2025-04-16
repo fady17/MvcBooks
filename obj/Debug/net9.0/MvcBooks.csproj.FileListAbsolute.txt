@@ -494,3 +494,7 @@
 /Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/cvntldupqz-xgro14qt7i.gz
 /Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/ekfqh40jqy-uylu70pxtc.gz
 /Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-ilm5nbr3ot.gz
+/Users/fady/Desktop/wdt/MvcBooks/bin/Debug/net9.0/CommunityToolkit.HighPerformance.dll
+/Users/fady/Desktop/wdt/MvcBooks/bin/Debug/net9.0/Minio.dll
+/Users/fady/Desktop/wdt/MvcBooks/bin/Debug/net9.0/System.IO.Hashing.dll
+/Users/fady/Desktop/wdt/MvcBooks/bin/Debug/net9.0/System.Reactive.dll

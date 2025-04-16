@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +14,7 @@ using MvcBooks.Models;
 using MvcBooks.Models.Data;
 using MvcBooks.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using MvcBooks.Services; // Reference MinioService
 
 namespace MvcBooks.Controllers
 {
@@ -21,35 +22,60 @@ namespace MvcBooks.Controllers
     public class BooksController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly IWebHostEnvironment _hostEnvironment;
         private readonly ILogger<BooksController> _logger;
-        private readonly string _coverImageFolder = Path.Combine("images", "covers");
-        private readonly string _bookFileFolder = Path.Combine("books");
+        private readonly MinioService _minioService;
+        private readonly string _coverImagePrefix = "covers";
+        private readonly string _bookFilePrefix = "books";
+        private const int LongPresignedUrlExpirySeconds = 60 * 60 * 24 * 7; // 7 days
+        private const int EditFormPresignedUrlExpirySeconds = 60 * 15; // 15 mins
 
-        public BooksController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment, ILogger<BooksController> logger)
+        public BooksController(ApplicationDbContext context,
+                               ILogger<BooksController> logger,
+                               MinioService minioService)
         {
             _context = context;
-            _hostEnvironment = hostEnvironment;
             _logger = logger;
+            _minioService = minioService;
+        }
+
+        // Helper - assumes MinioService handles bucket creation/check
+        private async Task EnsureBucketExistsAsync(CancellationToken cancellationToken = default)
+        {
+            // If MinioService needs explicit check, call it here.
+            // await _minioService.EnsureBucketExistsAsync(cancellationToken);
+            await Task.CompletedTask; // Assuming it's handled internally or on first use
         }
 
         [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                _logger.LogWarning("Details requested with null ID.");
-                return NotFound();
-            }
+            if (id == null) return NotFound();
             var book = await _context.Books
                 .Include(b => b.Categories)
                 .Include(b => b.User)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (book == null)
+            if (book == null) { _logger.LogWarning("Book ID {BookId} not found for Details.", id); return NotFound(); }
+
+            // Regenerate potentially expired presigned URLs just before sending to view
+            try
             {
-                 _logger.LogWarning("Book with ID {BookId} not found for Details.", id);
-                 return NotFound();
+                if (!string.IsNullOrEmpty(book.CoverImageObjectKey))
+                {
+                    book.CoverImageUrl = await _minioService.GetPresignedFileUrlAsync(book.CoverImageObjectKey, EditFormPresignedUrlExpirySeconds); // Use shorter expiry for details view maybe? Or long? Let's use long.
+                    // book.CoverImageUrl = await _minioService.GetPresignedFileUrlAsync(book.CoverImageObjectKey, LongPresignedUrlExpirySeconds);
+                    book.CoverImageUrl ??= "/images/placeholder-cover.png"; // Fallback if generation fails
+                }
+                if ((book.BookSourceType == "MINIO_EPUB" || book.BookSourceType == "MINIO_PDF") && !string.IsNullOrEmpty(book.BookFileObjectKey))
+                {
+                     book.BookUrl = await _minioService.GetPresignedFileUrlAsync(book.BookFileObjectKey, LongPresignedUrlExpirySeconds);
+                      if(string.IsNullOrEmpty(book.BookUrl)) _logger.LogWarning("Failed to regenerate BookUrl for Details view, Book ID {BookId}", id);
+                }
+            }
+            catch(Exception ex)
+            {
+                 _logger.LogError(ex, "Error regenerating presigned URL for Details view for Book ID {BookId}", id);
             }
 
             return View(book);
@@ -75,69 +101,83 @@ namespace MvcBooks.Controllers
             bool hasUrl = !string.IsNullOrWhiteSpace(viewModel.BookUrl);
 
             int sourceCount = (hasEpubFile ? 1 : 0) + (hasPdfFile ? 1 : 0) + (hasUrl ? 1 : 0);
-            if (sourceCount == 0) { ModelState.AddModelError(string.Empty, "Please provide either an EPUB file, a PDF file, OR a Book URL."); }
-            if (sourceCount > 1) { ModelState.AddModelError(string.Empty, "Please provide only ONE source: EPUB file, PDF file, OR Book URL."); }
+            if (sourceCount == 0) { ModelState.AddModelError("", "Please provide EPUB, PDF, or URL."); }
+            if (sourceCount > 1) { ModelState.AddModelError("", "Please provide only ONE source."); }
 
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Create Book ModelState invalid.");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) { ModelState.AddModelError("", "Authentication error."); }
+
+            if (!ModelState.IsValid) {
+                _logger.LogWarning("Create Book ModelState invalid (Initial).");
                 viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
                 return View(viewModel);
             }
 
-            Book book = new Book
-            {
+            Book book = new Book {
                 Title = viewModel.Title, Description = viewModel.Description, PublishedDate = viewModel.PublishedDate,
-                Author = viewModel.Author, UserId = User.FindFirstValue(ClaimTypes.NameIdentifier), IsPublic = viewModel.IsPublic
+                Author = viewModel.Author, UserId = userId!, IsPublic = viewModel.IsPublic
             };
 
-            string? uploadedCoverPath = null;
-            string? uploadedBookFilePath = null;
+            string? uploadedCoverKey = null;
+            string? uploadedBookKey = null;
 
-            try
-            {
-                if (viewModel.CoverImage != null && viewModel.CoverImage.Length > 0)
-                {
-                    uploadedCoverPath = await SaveFileAsync(viewModel.CoverImage!, _coverImageFolder);
-                    book.CoverImageUrl = uploadedCoverPath;
+            await EnsureBucketExistsAsync();
+
+            try {
+                if (viewModel.CoverImage != null && viewModel.CoverImage.Length > 0) {
+                    uploadedCoverKey = await _minioService.UploadFileAsync(viewModel.CoverImage!, _coverImagePrefix);
+                    if (uploadedCoverKey != null) {
+                        book.CoverImageObjectKey = uploadedCoverKey;
+                        book.CoverImageUrl = await _minioService.GetPresignedFileUrlAsync(uploadedCoverKey, LongPresignedUrlExpirySeconds);
+                        if (string.IsNullOrEmpty(book.CoverImageUrl)) ModelState.AddModelError("CoverImage", "Failed to generate cover image URL.");
+                    } else { ModelState.AddModelError("CoverImage", "Cover image upload failed."); }
                 }
 
-                if (hasEpubFile)
-                {
-                    uploadedBookFilePath = await SaveFileAsync(viewModel.EpubFile!, _bookFileFolder, ensureExtension: ".epub");
-                    book.EpubFilePath = uploadedBookFilePath;
-                    book.EpubFileName = viewModel.EpubFile!.FileName;
-                    book.PdfFilePath = null; book.PdfFileName = null; book.BookUrl = null;
-                }
-                else if (hasPdfFile)
-                {
-                    uploadedBookFilePath = await SaveFileAsync(viewModel.PdfFile!, _bookFileFolder, ensureExtension: ".pdf");
-                    book.PdfFilePath = uploadedBookFilePath;
-                    book.PdfFileName = viewModel.PdfFile!.FileName;
-                    book.EpubFilePath = null; book.EpubFileName = null; book.BookUrl = null;
-                }
-                else if (hasUrl)
-                {
+                IFormFile? bookFileToUpload = null;
+                string? bookSourceTypeForDb = null;
+                if (hasEpubFile) { bookFileToUpload = viewModel.EpubFile; bookSourceTypeForDb = "MINIO_EPUB"; }
+                else if (hasPdfFile) { bookFileToUpload = viewModel.PdfFile; bookSourceTypeForDb = "MINIO_PDF"; }
+
+                if (bookFileToUpload != null && bookSourceTypeForDb != null) {
+                     uploadedBookKey = await _minioService.UploadFileAsync(bookFileToUpload!, _bookFilePrefix);
+                     if (uploadedBookKey != null) {
+                        book.BookFileObjectKey = uploadedBookKey;
+                        book.BookSourceType = bookSourceTypeForDb;
+                        book.BookUrl = await _minioService.GetPresignedFileUrlAsync(uploadedBookKey, LongPresignedUrlExpirySeconds);
+                        if (string.IsNullOrEmpty(book.BookUrl)) ModelState.AddModelError("", "Failed to generate book access URL.");
+                     } else {
+                        string fileType = bookSourceTypeForDb.Split('_').ElementAtOrDefault(1) ?? "file";
+                        ModelState.AddModelError("", $"Failed to upload the {fileType}.");
+                     }
+                } else if (hasUrl) {
                     book.BookUrl = viewModel.BookUrl;
-                    book.EpubFilePath = null; book.EpubFileName = null;
-                    book.PdfFilePath = null; book.PdfFileName = null;
+                    book.BookSourceType = "EXTERNAL";
+                    book.BookFileObjectKey = null;
+                    // Keep existing Cover key/url if only providing external book url
+                    // book.CoverImageObjectKey = null; // Maybe don't clear these?
+                    // book.CoverImageUrl = null;
                 }
+
+                 if (!ModelState.IsValid) {
+                     _logger.LogWarning("Create Book ModelState invalid after file processing.");
+                     if(uploadedCoverKey != null) await _minioService.DeleteFileAsync(uploadedCoverKey);
+                     if(uploadedBookKey != null) await _minioService.DeleteFileAsync(uploadedBookKey);
+                     viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+                     return View(viewModel);
+                 }
 
                 await UpdateBookCategoriesAsync(book, viewModel.SelectedCategoryIds);
-
                 _context.Add(book);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Book '{BookTitle}' (ID: {BookId}) created successfully by User {UserId}.", book.Title, book.Id, book.UserId);
-
-                TempData["SuccessMessage"] = $"Book '{book.Title}' created successfully.";
+                _logger.LogInformation("Book '{Title}' created.", book.Title);
+                TempData["SuccessMessage"] = $"Book '{book.Title}' created.";
                 return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating book '{BookTitle}'.", viewModel.Title);
-                DeleteFile(uploadedCoverPath);
-                DeleteFile(uploadedBookFilePath);
-                ModelState.AddModelError(string.Empty, "An unexpected error occurred while saving the book.");
+            catch (Exception ex) {
+                _logger.LogError(ex, "Error creating book '{Title}'.", viewModel.Title);
+                if(uploadedCoverKey != null) await _minioService.DeleteFileAsync(uploadedCoverKey);
+                if(uploadedBookKey != null) await _minioService.DeleteFileAsync(uploadedBookKey);
+                ModelState.AddModelError("", "Unexpected error saving book.");
                 viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
                 return View(viewModel);
             }
@@ -146,30 +186,26 @@ namespace MvcBooks.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-            var book = await _context.Books.Include(b => b.Categories).FirstOrDefaultAsync(m => m.Id == id);
-            if (book == null)
-            {
-                 _logger.LogWarning("Book with ID {BookId} not found for Edit.", id);
-                 return NotFound();
-            }
+             var book = await _context.Books.Include(b => b.Categories).AsNoTracking().FirstOrDefaultAsync(m => m.Id == id);
+            if (book == null) { return NotFound(); }
+            if (!IsUserAuthorized(book.UserId)) { TempData["ErrorMessage"] = "Not Authorized"; return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" }); }
 
-            if (!IsUserAuthorized(book.UserId))
-            {
-                _logger.LogWarning("User {UserId} attempted unauthorized edit of Book ID {BookId} owned by {OwnerId}.", User.FindFirstValue(ClaimTypes.NameIdentifier), id, book.UserId);
-                TempData["ErrorMessage"] = "You are not authorized to edit this book.";
-                return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
+            string? currentCoverUrl = null;
+            if(!string.IsNullOrEmpty(book.CoverImageObjectKey)) {
+                 currentCoverUrl = await _minioService.GetPresignedFileUrlAsync(book.CoverImageObjectKey, EditFormPresignedUrlExpirySeconds);
             }
+            currentCoverUrl ??= "/images/placeholder-cover.png";
 
-            BookViewModel viewModel = new BookViewModel
-            {
-                Id = book.Id, Title = book.Title, Description = book.Description, PublishedDate = book.PublishedDate,
-                Author = book.Author, ExistingCoverUrl = book.CoverImageUrl,
-                ExistingEpubFileName = book.EpubFileName,
-                ExistingPdfFileName = book.PdfFileName,
-                ExistingBookUrl = book.BookUrl,
-                SelectedCategoryIds = book.Categories.Select(c => c.Id).ToList(),
-                AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync(),
-                IsPublic = book.IsPublic
+            BookViewModel viewModel = new BookViewModel {
+                 Id = book.Id, Title = book.Title, Description = book.Description, PublishedDate = book.PublishedDate,
+                 Author = book.Author, IsPublic = book.IsPublic,
+                 ExistingCoverUrl = currentCoverUrl, // Use fresh temporary URL
+                 BookUrl = book.BookSourceType == "EXTERNAL" ? book.BookUrl : null,
+                 ExistingBookUrl = book.BookSourceType == "EXTERNAL" ? book.BookUrl : null,
+                 SelectedCategoryIds = book.Categories.Select(c => c.Id).ToList(),
+                 AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync(),
+                 ExistingEpubFileName = book.BookSourceType == "MINIO_EPUB" ? "(Uploaded EPUB)" : null,
+                 ExistingPdfFileName = book.BookSourceType == "MINIO_PDF" ? "(Uploaded PDF)" : null,
             };
             return View(viewModel);
         }
@@ -178,167 +214,144 @@ namespace MvcBooks.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, BookViewModel viewModel)
         {
-            if (id != viewModel.Id) return NotFound();
+             if (id != viewModel.Id) return NotFound();
 
-            bool hasNewEpubFile = viewModel.EpubFile != null && viewModel.EpubFile.Length > 0;
-            bool hasNewPdfFile = viewModel.PdfFile != null && viewModel.PdfFile.Length > 0;
-            bool hasNewUrl = !string.IsNullOrWhiteSpace(viewModel.BookUrl);
+             var book = await _context.Books.Include(b => b.Categories).FirstOrDefaultAsync(b => b.Id == id);
+             if (book == null) { return NotFound(); }
+             if (!IsUserAuthorized(book.UserId)) { return Forbid(); }
 
-            int newSourceCount = (hasNewEpubFile ? 1 : 0) + (hasNewPdfFile ? 1 : 0) + (hasNewUrl ? 1 : 0);
-            if (newSourceCount > 1) { ModelState.AddModelError(string.Empty, "Please provide only ONE new source: EPUB file, PDF file, OR Book URL."); }
+             bool hasNewEpubFile = viewModel.EpubFile != null && viewModel.EpubFile.Length > 0;
+             bool hasNewPdfFile = viewModel.PdfFile != null && viewModel.PdfFile.Length > 0;
+             bool hasNewUrl = !string.IsNullOrWhiteSpace(viewModel.BookUrl);
+             int newSourceCount = (hasNewEpubFile ? 1 : 0) + (hasNewPdfFile ? 1 : 0) + (hasNewUrl ? 1 : 0);
+             if (newSourceCount > 1) { ModelState.AddModelError("", "Provide only ONE new source."); }
 
-            if (!ModelState.IsValid)
-            {
-                 _logger.LogWarning("Edit Book ModelState invalid for Book ID {BookId}.", id);
+            if (!ModelState.IsValid) {
                  viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
-                 // --- FIX: Repopulate needed existing data ---
-                 var currentBookData = await _context.Books.AsNoTracking().Where(b => b.Id == id).Select(b => new {b.EpubFileName, b.PdfFileName, b.BookUrl, b.CoverImageUrl, b.IsPublic }).FirstOrDefaultAsync();
-                 viewModel.ExistingEpubFileName = currentBookData?.EpubFileName;
-                 viewModel.ExistingPdfFileName = currentBookData?.PdfFileName;
-                 viewModel.ExistingBookUrl = currentBookData?.BookUrl;
-                 viewModel.ExistingCoverUrl = currentBookData?.CoverImageUrl;
-                 viewModel.IsPublic = currentBookData?.IsPublic ?? true;
-                 // --- END FIX ---
+                 viewModel.ExistingCoverUrl = !string.IsNullOrEmpty(book.CoverImageObjectKey) ? await _minioService.GetPresignedFileUrlAsync(book.CoverImageObjectKey, EditFormPresignedUrlExpirySeconds) ?? book.CoverImageUrl ?? "/images/placeholder-cover.png" : "/images/placeholder-cover.png";
+                 viewModel.ExistingBookUrl = book.BookSourceType == "EXTERNAL" ? book.BookUrl : null;
+                 viewModel.ExistingEpubFileName = book.BookSourceType == "MINIO_EPUB" ? "(Uploaded EPUB)" : null;
+                 viewModel.ExistingPdfFileName = book.BookSourceType == "MINIO_PDF" ? "(Uploaded PDF)" : null;
+                 viewModel.IsPublic = book.IsPublic;
                  return View(viewModel);
             }
 
-            var book = await _context.Books.Include(b => b.Categories).FirstOrDefaultAsync(b => b.Id == id);
-            if (book == null)
-            {
-                 _logger.LogWarning("Book with ID {BookId} not found during Edit POST.", id);
-                 return NotFound();
-            }
-            if (!IsUserAuthorized(book.UserId))
-            {
-                 _logger.LogWarning("User {UserId} attempted unauthorized POST edit of Book ID {BookId} owned by {OwnerId}.", User.FindFirstValue(ClaimTypes.NameIdentifier), id, book.UserId);
-                 return Forbid();
-            }
-
-            string? oldCoverPath = book.CoverImageUrl;
-            string? oldEpubPath = book.EpubFilePath;
-            string? oldPdfPath = book.PdfFilePath;
-            string? uploadedCoverPath = null;
-            string? uploadedBookFilePath = null;
+            string? oldCoverKey = book.CoverImageObjectKey;
+            string? oldBookFileKey = book.BookFileObjectKey;
+            string? uploadedCoverKey = null;
+            string? uploadedBookKey = null;
+            bool deleteOldCover = false;
+            bool deleteOldBookFile = false;
 
             try
             {
                 book.Title = viewModel.Title; book.Description = viewModel.Description; book.PublishedDate = viewModel.PublishedDate;
                 book.Author = viewModel.Author; book.IsPublic = viewModel.IsPublic;
 
-                if (viewModel.CoverImage != null && viewModel.CoverImage.Length > 0)
-                {
-                    uploadedCoverPath = await SaveFileAsync(viewModel.CoverImage!, _coverImageFolder);
-                    book.CoverImageUrl = uploadedCoverPath;
-                    DeleteFile(oldCoverPath);
-                }
+                 if (viewModel.CoverImage != null && viewModel.CoverImage.Length > 0) {
+                     uploadedCoverKey = await _minioService.UploadFileAsync(viewModel.CoverImage!, _coverImagePrefix);
+                     if (uploadedCoverKey != null) {
+                         book.CoverImageObjectKey = uploadedCoverKey;
+                         book.CoverImageUrl = await _minioService.GetPresignedFileUrlAsync(uploadedCoverKey, LongPresignedUrlExpirySeconds);
+                         if (string.IsNullOrEmpty(book.CoverImageUrl)) ModelState.AddModelError("CoverImage", "Failed to generate cover URL.");
+                         else deleteOldCover = !string.IsNullOrEmpty(oldCoverKey) && oldCoverKey != uploadedCoverKey;
+                     } else { ModelState.AddModelError("CoverImage", "Cover update failed."); }
+                 }
 
-                if (hasNewEpubFile)
-                {
-                    uploadedBookFilePath = await SaveFileAsync(viewModel.EpubFile!, _bookFileFolder, ensureExtension: ".epub");
-                    book.EpubFilePath = uploadedBookFilePath;
-                    book.EpubFileName = viewModel.EpubFile!.FileName;
-                    DeleteFile(oldEpubPath); DeleteFile(oldPdfPath);
-                    book.PdfFilePath = null; book.PdfFileName = null; book.BookUrl = null;
-                }
-                else if (hasNewPdfFile)
-                {
-                    uploadedBookFilePath = await SaveFileAsync(viewModel.PdfFile!, _bookFileFolder, ensureExtension: ".pdf");
-                    book.PdfFilePath = uploadedBookFilePath;
-                    book.PdfFileName = viewModel.PdfFile!.FileName;
-                    DeleteFile(oldPdfPath); DeleteFile(oldEpubPath);
-                    book.EpubFilePath = null; book.EpubFileName = null; book.BookUrl = null;
-                }
-                else if (hasNewUrl)
-                {
-                    if (book.BookUrl != viewModel.BookUrl)
-                    {
-                        book.BookUrl = viewModel.BookUrl;
-                        DeleteFile(oldEpubPath); DeleteFile(oldPdfPath);
-                        book.EpubFilePath = null; book.EpubFileName = null;
-                        book.PdfFilePath = null; book.PdfFileName = null;
-                    }
-                }
+                 IFormFile? newBookFile = null;
+                 string? newBookSourceTypeForDb = null;
+                 if (hasNewEpubFile) { newBookFile = viewModel.EpubFile; newBookSourceTypeForDb = "MINIO_EPUB"; }
+                 else if (hasNewPdfFile) { newBookFile = viewModel.PdfFile; newBookSourceTypeForDb = "MINIO_PDF"; }
+
+                if (newBookFile != null && newBookSourceTypeForDb != null) {
+                     uploadedBookKey = await _minioService.UploadFileAsync(newBookFile!, _bookFilePrefix);
+                     if (uploadedBookKey != null) {
+                         book.BookFileObjectKey = uploadedBookKey;
+                         book.BookSourceType = newBookSourceTypeForDb;
+                         book.BookUrl = await _minioService.GetPresignedFileUrlAsync(uploadedBookKey, LongPresignedUrlExpirySeconds);
+                         if(string.IsNullOrEmpty(book.BookUrl)) { ModelState.AddModelError("", "Failed to generate book URL."); }
+                         else { deleteOldBookFile = !string.IsNullOrEmpty(oldBookFileKey); }
+                     } else {
+                         string fileType = newBookSourceTypeForDb.Split('_').ElementAtOrDefault(1) ?? "file";
+                         ModelState.AddModelError("", $"Failed to upload new {fileType}.");
+                     }
+                 } else if (hasNewUrl) {
+                     if (book.BookUrl != viewModel.BookUrl || book.BookSourceType != "EXTERNAL") {
+                         book.BookUrl = viewModel.BookUrl;
+                         book.BookSourceType = "EXTERNAL";
+                         deleteOldBookFile = !string.IsNullOrEmpty(oldBookFileKey);
+                         book.BookFileObjectKey = null;
+                     }
+                 }
+
+                 if (!ModelState.IsValid) { throw new InvalidOperationException("File processing failed during edit."); }
 
                 await UpdateBookCategoriesAsync(book, viewModel.SelectedCategoryIds);
-
-                _context.Update(book);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Book '{BookTitle}' (ID: {BookId}) updated successfully by User {UserId}.", book.Title, book.Id, book.UserId);
 
-                TempData["SuccessMessage"] = $"Book '{book.Title}' updated successfully.";
+                // Delete old files using KEYS after successful save
+                if (deleteOldCover) await _minioService.DeleteFileAsync(oldCoverKey!);
+                if (deleteOldBookFile) await _minioService.DeleteFileAsync(oldBookFileKey!);
+
+                TempData["SuccessMessage"] = $"Book '{book.Title}' updated.";
                 return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
             }
-            catch (DbUpdateConcurrencyException ex)
-            {
+            catch (DbUpdateConcurrencyException ex) {
                  _logger.LogError(ex, "Concurrency error updating Book ID {BookId}.", id);
-                 // --- FIX: Use viewModel.Id for BookExists check ---
-                 if (!BookExists(viewModel.Id)) return NotFound(); else throw;
-                 // --- END FIX ---
+                 if (!BookExists(id)) return NotFound();
+                 ModelState.AddModelError("", "Concurrency conflict. Reload and try again.");
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                  _logger.LogError(ex, "Error updating book {BookId}.", id);
-                 DeleteFile(uploadedCoverPath); DeleteFile(uploadedBookFilePath);
-                 ModelState.AddModelError(string.Empty, "An unexpected error occurred saving changes.");
-                 viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
-                 // --- FIX: Repopulate needed existing data ---
-                 var originalBookData = await _context.Books.AsNoTracking().Where(b => b.Id == id).Select(b => new {b.CoverImageUrl, b.EpubFileName, b.PdfFileName, b.BookUrl, b.IsPublic}).FirstOrDefaultAsync();
-                 viewModel.ExistingCoverUrl = originalBookData?.CoverImageUrl;
-                 viewModel.ExistingEpubFileName = originalBookData?.EpubFileName;
-                 viewModel.ExistingPdfFileName = originalBookData?.PdfFileName;
-                 viewModel.ExistingBookUrl = originalBookData?.BookUrl;
-                 viewModel.IsPublic = originalBookData?.IsPublic ?? true;
-                 // --- END FIX ---
-                 return View(viewModel);
-             }
+                 if(uploadedCoverKey != null) await _minioService.DeleteFileAsync(uploadedCoverKey);
+                 if(uploadedBookKey != null) await _minioService.DeleteFileAsync(uploadedBookKey);
+                 if (!ModelState.ContainsKey("")) ModelState.AddModelError("", "Unexpected error.");
+            }
+
+             // Common error return path
+             viewModel.AvailableCategories = await _context.Categories.OrderBy(c => c.Name).ToListAsync();
+             viewModel.ExistingCoverUrl = !string.IsNullOrEmpty(book.CoverImageObjectKey) ? await _minioService.GetPresignedFileUrlAsync(book.CoverImageObjectKey, EditFormPresignedUrlExpirySeconds) ?? book.CoverImageUrl ?? "/images/placeholder-cover.png" : "/images/placeholder-cover.png";
+             viewModel.ExistingBookUrl = book.BookSourceType == "EXTERNAL" ? book.BookUrl : null;
+             viewModel.ExistingEpubFileName = book.BookSourceType == "MINIO_EPUB" ? "(Uploaded EPUB)" : null;
+             viewModel.ExistingPdfFileName = book.BookSourceType == "MINIO_PDF" ? "(Uploaded PDF)" : null;
+             viewModel.IsPublic = book.IsPublic;
+             return View(viewModel);
         }
 
         public async Task<IActionResult> Delete(int? id)
         {
              if (id == null) return NotFound();
-             var book = await _context.Books.Include(b => b.User).FirstOrDefaultAsync(m => m.Id == id);
-             if (book == null) return NotFound();
-             if (!IsUserAuthorized(book.UserId))
-             {
-                 _logger.LogWarning("User {UserId} attempted unauthorized GET delete of Book ID {BookId} owned by {OwnerId}.", User.FindFirstValue(ClaimTypes.NameIdentifier), id, book.UserId);
-                 TempData["ErrorMessage"] = "You are not authorized to delete this book.";
-                 return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
-             }
-             return View(book);
+             var bookData = await _context.Books.Select(b => new { b.Id, b.Title, b.Author, b.UserId }).FirstOrDefaultAsync(m => m.Id == id);
+             if (bookData == null) return NotFound();
+             if (!IsUserAuthorized(bookData.UserId)) { TempData["ErrorMessage"] = "Not Authorized"; return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" }); }
+             ViewData["BookTitle"] = bookData.Title; ViewData["BookAuthor"] = bookData.Author ?? "N/A";
+             return View(new Book { Id = bookData.Id, Title = bookData.Title ?? "Book" });
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var book = await _context.Books.FindAsync(id);
-            if (book == null) return NotFound();
-            if (!IsUserAuthorized(book.UserId))
-            {
-                 _logger.LogWarning("User {UserId} attempted unauthorized POST delete of Book ID {BookId} owned by {OwnerId}.", User.FindFirstValue(ClaimTypes.NameIdentifier), id, book.UserId);
-                 return Forbid();
-            }
+            var bookToDelete = await _context.Books.Select(b => new { b.Id, b.Title, b.UserId, b.CoverImageObjectKey, b.BookFileObjectKey }).AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
+            if (bookToDelete == null) return NotFound();
+            if (!IsUserAuthorized(bookToDelete.UserId)) return Forbid();
 
-            string? coverPath = book.CoverImageUrl;
-            string? epubPath = book.EpubFilePath;
-            string? pdfPath = book.PdfFilePath;
-            string bookTitle = book.Title;
+            string? coverKey = bookToDelete.CoverImageObjectKey;
+            string? bookFileKey = bookToDelete.BookFileObjectKey;
+            string bookTitle = bookToDelete.Title;
 
-            try
-            {
-                _context.Books.Remove(book);
-                await _context.SaveChangesAsync();
+            try {
+                 int deletedRows = await _context.Books.Where(b => b.Id == id).ExecuteDeleteAsync();
+                 if (deletedRows == 0) { return NotFound(); }
 
-                DeleteFile(coverPath);
-                DeleteFile(epubPath);
-                DeleteFile(pdfPath);
-                 _logger.LogInformation("Book '{BookTitle}' (ID: {BookId}) deleted successfully by User {UserId}.", bookTitle, id, book.UserId);
+                if (!string.IsNullOrEmpty(coverKey)) await _minioService.DeleteFileAsync(coverKey);
+                if (!string.IsNullOrEmpty(bookFileKey)) await _minioService.DeleteFileAsync(bookFileKey);
 
-                TempData["SuccessMessage"] = $"Book '{bookTitle}' deleted successfully.";
+                _logger.LogInformation("Book '{Title}' deleted.", bookTitle);
+                TempData["SuccessMessage"] = $"Book '{bookTitle}' deleted.";
                 return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                  _logger.LogError(ex, "Error deleting book {BookId}.", id);
                  TempData["ErrorMessage"] = $"Could not delete book '{bookTitle}'.";
                  return RedirectToPage("/Account/Manage/MyBooks", new { area = "Identity" });
@@ -346,179 +359,97 @@ namespace MvcBooks.Controllers
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Read(int? id)
+        public async Task<IActionResult> Read(int? id) // Handles EPUB/External
         {
              if (id == null) return NotFound();
-             var book = await _context.Books.FindAsync(id);
+             var book = await _context.Books.Select(b => new { b.Id, b.Title, b.BookUrl, b.BookSourceType, b.BookFileObjectKey }).AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
              if (book == null) return NotFound();
 
-             bool hasEpubSource = !string.IsNullOrEmpty(book.EpubFilePath) ||
-                                 (!string.IsNullOrEmpty(book.BookUrl) && !book.BookUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase));
-
-             if (!hasEpubSource)
-             {
-                 if (!string.IsNullOrEmpty(book.PdfFilePath) || (!string.IsNullOrEmpty(book.BookUrl) && book.BookUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)))
-                 {
-                     _logger.LogInformation("Redirecting from Read to ReadPdf for Book ID {BookId}", id);
-                     return RedirectToAction(nameof(ReadPdf), new { id = id });
-                 }
-                 else
-                 {
-                     _logger.LogWarning("No EPUB/viewable content found for Book ID {BookId} in Read action.", id);
-                     TempData["ErrorMessage"] = "No EPUB/viewable content found for this book.";
-                 }
+             bool canHandle = book.BookSourceType == "MINIO_EPUB" || book.BookSourceType == "EXTERNAL";
+             if (!canHandle) {
+                if(book.BookSourceType == "MINIO_PDF") return RedirectToAction(nameof(ReadPdf), new { id = id });
+                TempData["ErrorMessage"] = "No viewable EPUB or link found."; return View("Read", new Book { Id = book.Id, Title = book.Title ?? "Book" });
              }
-             return View("Read", book);
+
+             string? accessUrl = book.BookUrl;
+             // Regenerate MinIO URL if it's MinIO (covers potential expiry)
+             if(book.BookSourceType == "MINIO_EPUB" && !string.IsNullOrEmpty(book.BookFileObjectKey)) {
+                accessUrl = await _minioService.GetPresignedFileUrlAsync(book.BookFileObjectKey, LongPresignedUrlExpirySeconds);
+             }
+
+             if(string.IsNullOrEmpty(accessUrl)) { TempData["ErrorMessage"] = "Source URL missing or invalid."; return View("Read", new Book { Id = book.Id, Title = book.Title ?? "Book" }); }
+             return View("Read", new Book { Id = book.Id, Title = book.Title ?? "Book", BookUrl = accessUrl });
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> ReadPdf(int? id)
+        public async Task<IActionResult> ReadPdf(int? id) // Handles PDF
         {
              if (id == null) return NotFound();
-             var book = await _context.Books.FindAsync(id);
+             var book = await _context.Books.Select(b => new { b.Id, b.Title, b.BookUrl, b.BookSourceType, b.BookFileObjectKey }).AsNoTracking().FirstOrDefaultAsync(b => b.Id == id);
              if (book == null) return NotFound();
 
-             bool hasPdfSource = !string.IsNullOrEmpty(book.PdfFilePath);
-
-             if (!hasPdfSource)
-             {
-                  if (!string.IsNullOrEmpty(book.EpubFilePath) || (!string.IsNullOrEmpty(book.BookUrl) && !book.BookUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)))
-                  {
-                      _logger.LogInformation("Redirecting from ReadPdf to Read for Book ID {BookId}", id);
-                      return RedirectToAction(nameof(Read), new { id = id });
-                  }
-                  else
-                  {
-                      _logger.LogWarning("No PDF content found for Book ID {BookId} in ReadPdf action.", id);
-                      TempData["ErrorMessage"] = "No PDF content found for this book.";
-                      return RedirectToAction(nameof(Details), new { id = id });
-                  }
+             bool hasPdfSource = book.BookSourceType == "MINIO_PDF";
+             if (!hasPdfSource) {
+                 if(book.BookSourceType == "MINIO_EPUB" || book.BookSourceType == "EXTERNAL") return RedirectToAction(nameof(Read), new { id = id });
+                 TempData["ErrorMessage"] = "No PDF source."; return RedirectToAction(nameof(Details), new { id = id });
              }
-             return View("ReadPdf", book);
+
+             string? accessUrl = book.BookUrl;
+             // Regenerate MinIO URL if it's MinIO
+             if(!string.IsNullOrEmpty(book.BookFileObjectKey)) {
+                 accessUrl = await _minioService.GetPresignedFileUrlAsync(book.BookFileObjectKey, LongPresignedUrlExpirySeconds);
+             }
+
+             if(string.IsNullOrEmpty(accessUrl)) { TempData["ErrorMessage"] = "PDF Source URL missing or invalid."; return RedirectToAction(nameof(Details), new { id = id }); }
+             // Pass only ID/Title and the URL to the view
+             return View("ReadPdf", new Book { Id = book.Id, Title = book.Title ?? "Book", BookUrl = accessUrl });
         }
 
-        [AllowAnonymous]
-        public async Task<IActionResult> GetEpub(int id)
-        {
-            var book = await _context.Books.FindAsync(id);
-            if (book == null || string.IsNullOrEmpty(book.EpubFilePath))
-            {
-                _logger.LogWarning("GetEpub failed: EPUB file not found or not specified for Book ID {BookId}.", id);
-                return NotFound("EPUB file not found or not specified for this book.");
-            }
-
-            string epubPath = GetAbsolutePath(book.EpubFilePath.TrimStart('/'));
-            if (!System.IO.File.Exists(epubPath))
-            {
-                _logger.LogError("GetEpub failed: File not found at specified path '{EpubPath}' for Book ID {BookId}.", book.EpubFilePath, id);
-                return NotFound($"EPUB file not found at specified path.");
-            }
-            try
-            {
-                return File(await System.IO.File.ReadAllBytesAsync(epubPath), "application/epub+zip");
-            }
-            catch (IOException ex)
-            {
-                 _logger.LogError(ex, "IOException reading EPUB file {EpubPath} for Book ID {BookId}.", epubPath, id);
-                 return StatusCode(StatusCodes.Status500InternalServerError, "Error reading EPUB file.");
-             }
-        }
-
-        [AllowAnonymous]
+                [AllowAnonymous]
         public async Task<IActionResult> GetPdf(int id)
         {
-            var book = await _context.Books.FindAsync(id);
-            if (book == null || string.IsNullOrEmpty(book.PdfFilePath))
-            {
-                _logger.LogWarning("GetPdf failed: PDF file not found or not specified for Book ID {BookId}.", id);
-                return NotFound("PDF file not found or not specified for this book.");
-            }
+             // 1. Retrieve the Key needed for this PDF book
+             var bookData = await _context.Books
+                .Where(b => b.Id == id && b.BookSourceType == "MINIO_PDF") // Checks ID and Type
+                .Select(b => new { b.BookFileObjectKey, b.IsPublic, b.UserId }) // Select only key and auth fields
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
 
-            string pdfPath = GetAbsolutePath(book.PdfFilePath.TrimStart('/'));
-            if (!System.IO.File.Exists(pdfPath))
-            {
-                _logger.LogError("GetPdf failed: File not found at specified path '{PdfPath}' for Book ID {BookId}.", book.PdfFilePath, id);
-                return NotFound($"PDF file not found at specified path.");
-            }
-            try
-            {
-                 return File(await System.IO.File.ReadAllBytesAsync(pdfPath), "application/pdf");
-            }
-            catch (IOException ex)
-            {
-                 _logger.LogError(ex, "IOException reading PDF file {PdfPath} for Book ID {BookId}.", pdfPath, id);
-                 return StatusCode(StatusCodes.Status500InternalServerError, "Error reading PDF file.");
+            // --- Possibility 1: Book doesn't exist OR is not MINIO_PDF ---
+            if (bookData == null || string.IsNullOrEmpty(bookData.BookFileObjectKey)) {
+                 _logger.LogWarning("GetPdf failed: PDF object key not found or book type mismatch for Book ID {BookId}.", id);
+                 return NotFound("PDF file not found or not specified for this book."); // Returns 404
              }
+
+             // Optional Auth Check
+             // if (!bookData.IsPublic && !IsUserAuthorized(bookData.UserId)) return Forbid(); // Could return 403
+
+             // --- Possibility 2: MinIO Service fails to get the stream ---
+             Stream? stream = await _minioService.GetFileStreamAsync(bookData.BookFileObjectKey);
+             if (stream == null) {
+                  _logger.LogError("GetPdf failed: Could not retrieve stream for key '{ObjectKey}' for Book ID {BookId}.", bookData.BookFileObjectKey, id);
+                  return NotFound("PDF file stream could not be retrieved."); // Returns 404
+             }
+
+             _logger.LogInformation("Serving PDF stream for key {ObjectKey}", bookData.BookFileObjectKey);
+             return File(stream, "application/pdf"); // Returns 200 OK with file data
         }
 
-        private string GetAbsolutePath(string relativePath)
-        {
-            relativePath = relativePath.TrimStart('/', '\\');
-            return Path.Combine(_hostEnvironment.WebRootPath, relativePath);
-        }
-
-        private async Task<string?> SaveFileAsync(IFormFile file, string folderPath, string? ensureExtension = null)
-        {
-            string targetFolder = Path.Combine(_hostEnvironment.WebRootPath, folderPath);
-            Directory.CreateDirectory(targetFolder);
-            string extension = Path.GetExtension(file.FileName);
-            if (ensureExtension != null && !extension.Equals(ensureExtension, StringComparison.OrdinalIgnoreCase))
-            {
-                extension = ensureExtension;
-            }
-            string uniqueFileNameBase = Guid.NewGuid().ToString();
-            string uniqueFileName = uniqueFileNameBase + extension;
-            string absoluteFilePath = Path.Combine(targetFolder, uniqueFileName);
-            using (var fileStream = new FileStream(absoluteFilePath, FileMode.Create))
-            {
-                await file.CopyToAsync(fileStream);
-            }
-            _logger.LogInformation("File saved: {RelativePath}", $"/{folderPath.Replace(Path.DirectorySeparatorChar, '/')}/{uniqueFileName}");
-            return $"/{folderPath.Replace(Path.DirectorySeparatorChar, '/')}/{uniqueFileName}";
-        }
-
-        private async Task UpdateBookCategoriesAsync(Book book, List<int>? selectedCategoryIds)
-        {
-            book.Categories ??= new List<Category>();
-            if (selectedCategoryIds == null || !selectedCategoryIds.Any()) { book.Categories.Clear(); return; }
-            var selectedIdsSet = new HashSet<int>(selectedCategoryIds);
-            var currentIdsSet = new HashSet<int>(book.Categories.Select(c => c.Id));
-            var categoriesToRemove = book.Categories.Where(c => !selectedIdsSet.Contains(c.Id)).ToList();
-            foreach (var cat in categoriesToRemove) { book.Categories.Remove(cat); }
-            var idsToAdd = selectedIdsSet.Where(id => !currentIdsSet.Contains(id)).ToList();
-            if (idsToAdd.Any()){
-                var catsToAdd = await _context.Categories.Where(c => idsToAdd.Contains(c.Id)).ToListAsync();
-                foreach (var cat in catsToAdd) { book.Categories.Add(cat); }
-            }
-        }
-
-        private bool IsUserAuthorized(string? resourceOwnerUserId)
-        {
-            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            
-            return (resourceOwnerUserId != null && resourceOwnerUserId == currentUserId) || User.IsInRole("Admin");
-        }
-
+        // --- Helper Methods ---
+        private async Task UpdateBookCategoriesAsync(Book book, List<int>? selectedCategoryIds) {
+             if (book.Id > 0 && !_context.Entry(book).Collection(b => b.Categories).IsLoaded) { await _context.Entry(book).Collection(b => b.Categories).LoadAsync(); }
+             book.Categories ??= new List<Category>();
+             if (selectedCategoryIds == null || !selectedCategoryIds.Any()) { book.Categories.Clear(); return; }
+             var selectedIdsSet = new HashSet<int>(selectedCategoryIds);
+             var currentIdsSet = new HashSet<int>(book.Categories.Select(c => c.Id));
+             var categoriesToRemove = book.Categories.Where(c => !selectedIdsSet.Contains(c.Id)).ToList();
+             foreach (var cat in categoriesToRemove) { book.Categories.Remove(cat); }
+             var idsToAdd = selectedIdsSet.Where(id => !currentIdsSet.Contains(id)).ToList();
+             if (idsToAdd.Any()){ var catsToAdd = await _context.Categories.Where(c => idsToAdd.Contains(c.Id)).ToListAsync(); foreach (var cat in catsToAdd) { book.Categories.Add(cat); } }
+         }
+        private bool IsUserAuthorized(string? resourceOwnerUserId) { var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier); return (resourceOwnerUserId != null && resourceOwnerUserId == currentUserId) || User.IsInRole("Admin"); }
         private bool BookExists(int id) => _context.Books.Any(e => e.Id == id);
+        private async Task DeleteMinioObjectAsync(string? objectKey) { if (!string.IsNullOrEmpty(objectKey)) { bool deleted = await _minioService.DeleteFileAsync(objectKey); if(!deleted) _logger.LogWarning("Delete failed for key '{Key}'.", objectKey); else _logger.LogInformation("Deleted MinIO object: {Key}", objectKey); } }
 
-        private void DeleteFile(string? relativePath)
-        {
-            if (!string.IsNullOrEmpty(relativePath))
-            {
-                try
-                {
-                    string absolutePath = GetAbsolutePath(relativePath);
-                    if (System.IO.File.Exists(absolutePath))
-                    {
-                        System.IO.File.Delete(absolutePath);
-                        _logger.LogInformation("File deleted: {FilePath}", absolutePath);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Could not delete file {RelativePath}.", relativePath);
-                }
-            }
-        }
     }
 }

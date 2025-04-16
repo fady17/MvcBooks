@@ -11,21 +11,8 @@
 <h2>Book Details</h2>
 <hr />
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        @TempData["SuccessMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        @TempData["ErrorMessage"]
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-}
-
+@if (TempData["SuccessMessage"] != null) { <div class="alert alert-success alert-dismissible fade show" role="alert"> @TempData["SuccessMessage"] <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div> }
+@if (TempData["ErrorMessage"] != null) { <div class="alert alert-danger alert-dismissible fade show" role="alert"> @TempData["ErrorMessage"] <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button> </div> }
 
 <div class="row">
     <div class="col-md-4 mb-3 text-center">
@@ -36,110 +23,86 @@
              onerror="this.onerror=null; this.src='/images/placeholder-cover.png';" />
 
       <div class="mt-3 d-grid">
-          @if (!string.IsNullOrEmpty(Model.PdfFilePath))
+          @* --- START: Updated Read Button Logic --- *@
+          @if (Model.BookSourceType == "MINIO_PDF")
           {
               <a asp-action="ReadPdf" asp-route-id="@Model.Id" class="btn btn-danger btn-lg">
                   <i class="fas fa-file-pdf"></i> Read PDF
               </a>
           }
-          else if (!string.IsNullOrEmpty(Model.EpubFilePath) || (!string.IsNullOrEmpty(Model.BookUrl) && !Model.BookUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)))
+          else if (Model.BookSourceType == "MINIO_EPUB")
           {
                <a asp-action="Read" asp-route-id="@Model.Id" class="btn btn-success btn-lg">
-                  <i class="fas fa-book-open"></i> Read EPUB/Link
+                  <i class="fas fa-book-open"></i> Read EPUB
               </a>
           }
-           else if (!string.IsNullOrEmpty(Model.BookUrl) && Model.BookUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-           {
-                <a asp-action="ReadPdf" asp-route-id="@Model.Id" class="btn btn-danger btn-lg">
-                      <i class="fas fa-file-pdf"></i> Read PDF (URL)
-                 </a>
-           }
-          else
+          else if (Model.BookSourceType == "EXTERNAL") // Handle External URL
+          {
+               <a href="@Model.BookUrl" target="_blank" rel="noopener noreferrer" class="btn btn-info btn-lg">
+                  <i class="fas fa-external-link-alt"></i> Open External Link
+              </a>
+               @* Optionally, try to route external PDFs to ReadPdf, EPUBs to Read if needed
+               else if (Model.BookSourceType == "EXTERNAL" && Model.BookUrl != null && Model.BookUrl.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+               {
+                   // Maybe redirect via controller? Or try direct link? Direct link is simpler.
+                   <a href="@Model.BookUrl" target="_blank" rel="noopener noreferrer" class="btn btn-info btn-lg"> <i class="fas fa-external-link-alt"></i> Open External PDF </a>
+               }
+               else if (Model.BookSourceType == "EXTERNAL")
+               {
+                   <a href="@Model.BookUrl" target="_blank" rel="noopener noreferrer" class="btn btn-info btn-lg"> <i class="fas fa-external-link-alt"></i> Open External Link </a>
+               }
+               *@
+          }
+          else // No viewable source identified
           {
               <button type="button" class="btn btn-secondary btn-lg disabled" aria-disabled="true">
                   <i class="fas fa-times-circle"></i> No Readable Content
               </button>
-              <small class="text-muted mt-1">No EPUB or PDF file/link available.</small>
+              <small class="text-muted mt-1">No EPUB, PDF, or external link available.</small>
           }
+          @* --- END: Updated Read Button Logic --- *@
       </div>
     </div>
 
     <div class="col-md-8 mb-3">
         <h3>@Html.DisplayFor(model => model.Title)</h3>
-        @if (!string.IsNullOrWhiteSpace(Model.Author))
-        {
-            <h5 class="text-muted mb-3">by @Html.DisplayFor(model => model.Author)</h5>
-        }
+        @if (!string.IsNullOrWhiteSpace(Model.Author)) { <h5 class="text-muted mb-3">by @Html.DisplayFor(model => model.Author)</h5> }
 
         <dl class="row dl-horizontal">
             <dt class="col-sm-3">Description</dt>
-            <dd class="col-sm-9">
-                @if (!string.IsNullOrWhiteSpace(Model.Description))
-                {
-                    @Html.Raw(System.Text.RegularExpressions.Regex.Replace(Html.Encode(Model.Description), @"\n", "<br />"))
-                }
-                else
-                {
-                    <span class="text-muted fst-italic">No description provided.</span>
-                }
-            </dd>
+            <dd class="col-sm-9">@if (!string.IsNullOrWhiteSpace(Model.Description)) { @Html.Raw(System.Text.RegularExpressions.Regex.Replace(Html.Encode(Model.Description), @"\n", "<br />")) } else { <span class="text-muted fst-italic">No description provided.</span> }</dd>
+            <dt class="col-sm-3">Published Date</dt><dd class="col-sm-9">@Model.PublishedDate.ToString("yyyy-MM-dd")</dd>
+            <dt class="col-sm-3">Categories</dt><dd class="col-sm-9">@if (Model.Categories != null && Model.Categories.Any()){ foreach (var category in Model.Categories){ <span class="badge bg-info me-1">@category.Name</span> } } else { <span class="text-muted">None</span> }</dd>
 
-            <dt class="col-sm-3">Published Date</dt>
-            <dd class="col-sm-9">@Model.PublishedDate.ToString("yyyy-MM-dd")</dd>
-
-            <dt class="col-sm-3">Categories</dt>
-            <dd class="col-sm-9">
-                @if (Model.Categories != null && Model.Categories.Any())
-                {
-                    foreach (var category in Model.Categories)
-                    {
-                        <span class="badge bg-info me-1">@category.Name</span>
-                    }
-                }
-                else
-                {
-                    <span class="text-muted">None</span>
-                }
-            </dd>
-
+             @* --- START: Updated Source Display --- *@
              <dt class="col-sm-3">Source</dt>
              <dd class="col-sm-9">
-                 @if (!string.IsNullOrEmpty(Model.EpubFilePath))
-                 {
-                     <span><i class="fas fa-book-open me-1 text-success"></i> Uploaded EPUB: @(Model.EpubFileName ?? "EPUB File")</span>
-                     <a asp-action="GetEpub" asp-route-id="@Model.Id" class="ms-2 small" title="Download EPUB"><i class="fas fa-download"></i> Download</a>
-                 }
-                 else if (!string.IsNullOrEmpty(Model.PdfFilePath))
-                 {
-                     <span><i class="fas fa-file-pdf me-1 text-danger"></i> Uploaded PDF: @(Model.PdfFileName ?? "PDF File")</span>
-                     <a asp-action="GetPdf" asp-route-id="@Model.Id" class="ms-2 small" title="Download PDF"><i class="fas fa-download"></i> Download</a>
-                 }
-                 else if (!string.IsNullOrEmpty(Model.BookUrl))
-                 {
+                 @if (Model.BookSourceType == "MINIO_EPUB") {
+                     <span><i class="fas fa-book-open me-1 text-success"></i> Uploaded EPUB</span>
+                     @* Download link relies on fragile URL parsing, consider removing or adding keys back *@
+                     @* <a asp-action="GetEpub" asp-route-id="@Model.Id" class="ms-2 small" title="Download EPUB"><i class="fas fa-download"></i> Download</a> *@
+                 } else if (Model.BookSourceType == "MINIO_PDF") {
+                     <span><i class="fas fa-file-pdf me-1 text-danger"></i> Uploaded PDF</span>
+                     @* Download link relies on fragile URL parsing, consider removing or adding keys back *@
+                     @* <a asp-action="GetPdf" asp-route-id="@Model.Id" class="ms-2 small" title="Download PDF"><i class="fas fa-download"></i> Download</a> *@
+                 } else if (Model.BookSourceType == "EXTERNAL" && !string.IsNullOrEmpty(Model.BookUrl)) {
                      <span><i class="fas fa-link me-1 text-primary"></i> External URL: <a href="@Model.BookUrl" target="_blank" rel="noopener noreferrer">@Model.BookUrl</a></span>
-                 }
-                 else
-                 {
+                 } else {
                      <span class="text-muted">N/A</span>
                  }
              </dd>
+             @* --- END: Updated Source Display --- *@
 
               <dt class="col-sm-3">Added By</dt><dd class="col-sm-9">@(Model.User?.UserName ?? "N/A")</dd>
               <dt class="col-sm-3">Visibility</dt><dd class="col-sm-9">@if(Model.IsPublic){<span class="badge bg-success"><i class="fas fa-eye me-1"></i> Public</span>} else {<span class="badge bg-secondary"><i class="fas fa-lock me-1"></i> Private</span>}</dd>
         </dl>
 
         <div class="mt-4">
-             @if (SignInManager.IsSignedIn(User))
-             {
+             @if (SignInManager.IsSignedIn(User)) {
                  var currentUserId = UserManager.GetUserId(User);
-                 @if (Model.UserId != null && Model.UserId == currentUserId)
-                 {
-                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                         <i class="fas fa-edit"></i> Edit
-                     </a>
-                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger ms-2">
-                        <i class="fas fa-trash-alt"></i> Delete
-                    </a>
+                 @if (Model.UserId != null && Model.UserId == currentUserId) {
+                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning"><i class="fas fa-edit"></i> Edit</a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger ms-2"><i class="fas fa-trash-alt"></i> Delete</a>
                  }
              }
         </div>
