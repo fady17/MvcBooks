@@ -133,3 +133,5 @@ wwwroot/books/*
 
 docker-compose.override.yml
 .dockerignore
+
+minio-data
