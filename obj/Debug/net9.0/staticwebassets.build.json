@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "wd6nG2MkasxHIwM6x5zTXKs1HMu8tYKNyLs+IRX/jjI=",
+  "Hash": "YCEibhXdNDz66WrcWZ3aFwCVbM+LShbyGwd5BweNR0g=",
   "Source": "MvcBooks",
   "BasePath": "_content/MvcBooks",
   "Mode": "Default",
@@ -1886,12 +1886,12 @@
       "OriginalItemSpec": "/Users/fady/.nuget/packages/microsoft.aspnetcore.identity.ui/9.0.4/staticwebassets/V5/lib/bootstrap/dist/css/bootstrap.min.css"
     },
     {
-      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-ilm5nbr3ot.gz",
+      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-nhji6g2ieo.gz",
       "SourceId": "MvcBooks",
       "SourceType": "Discovered",
       "ContentRoot": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/",
       "BasePath": "_content/MvcBooks",
-      "RelativePath": "css/site#[.{fingerprint=ilm5nbr3ot}]?.css.gz",
+      "RelativePath": "css/site#[.{fingerprint=nhji6g2ieo}]?.css.gz",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -1900,8 +1900,8 @@
       "RelatedAsset": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/css/site.css",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "t8tlt25qeb",
-      "Integrity": "syPMFgXERuTRqWz2MTOeNyYLYgN0ERHv9J634x+u+kQ=",
+      "Fingerprint": "48md2j00pg",
+      "Integrity": "POAPkIQgvJXlyp0SCPTwmwEtCnQqlHPRYo611CxXdDk=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/css/site.css"
@@ -1970,12 +1970,12 @@
       "OriginalItemSpec": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/lib/bootstrap/dist/js/bootstrap.bundle.min.js.map"
     },
     {
-      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/64jhpjs4u9-dgycb8tcwm.gz",
+      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/64jhpjs4u9-qqot4at1li.gz",
       "SourceId": "MvcBooks",
       "SourceType": "Computed",
       "ContentRoot": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/",
       "BasePath": "_content/MvcBooks",
-      "RelativePath": "MvcBooks#[.{fingerprint=dgycb8tcwm}]!.bundle.scp.css.gz",
+      "RelativePath": "MvcBooks#[.{fingerprint=qqot4at1li}]!.bundle.scp.css.gz",
       "AssetKind": "All",
       "AssetMode": "Reference",
       "AssetRole": "Alternative",
@@ -1984,8 +1984,8 @@
       "RelatedAsset": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/scopedcss/projectbundle/MvcBooks.bundle.scp.css",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "27p98ph77a",
-      "Integrity": "zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc=",
+      "Fingerprint": "wc74ynze0e",
+      "Integrity": "QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/scopedcss/projectbundle/MvcBooks.bundle.scp.css"
@@ -3797,12 +3797,12 @@
       "OriginalItemSpec": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.rtl.css.map"
     },
     {
-      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-75lfwsl4ln.gz",
+      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-fo16v8ge8p.gz",
       "SourceId": "MvcBooks",
       "SourceType": "Discovered",
       "ContentRoot": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/",
       "BasePath": "_content/MvcBooks",
-      "RelativePath": "js/site#[.{fingerprint=75lfwsl4ln}]?.js.gz",
+      "RelativePath": "js/site#[.{fingerprint=fo16v8ge8p}]?.js.gz",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -3811,8 +3811,8 @@
       "RelatedAsset": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/js/site.js",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "g0jinijdjx",
-      "Integrity": "wJ+oYUYH3HwaD8cJSM8JXKvZR5ikII6JiovZAgcyhBU=",
+      "Fingerprint": "ekrzxpb2s7",
+      "Integrity": "Tmu71NMdiFw/tXF8sBVj6KYAmpoajmHQ9k500FUMzgI=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/js/site.js"
@@ -5687,12 +5687,12 @@
       "OriginalItemSpec": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/lib/bootstrap/dist/css/bootstrap-utilities.css.map"
     },
     {
-      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/zh7fo5q8w9-dgycb8tcwm.gz",
+      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/zh7fo5q8w9-qqot4at1li.gz",
       "SourceId": "MvcBooks",
       "SourceType": "Computed",
       "ContentRoot": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/",
       "BasePath": "_content/MvcBooks",
-      "RelativePath": "MvcBooks#[.{fingerprint=dgycb8tcwm}]?.styles.css.gz",
+      "RelativePath": "MvcBooks#[.{fingerprint=qqot4at1li}]?.styles.css.gz",
       "AssetKind": "All",
       "AssetMode": "CurrentProject",
       "AssetRole": "Alternative",
@@ -5701,8 +5701,8 @@
       "RelatedAsset": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/scopedcss/bundle/MvcBooks.styles.css",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "27p98ph77a",
-      "Integrity": "zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc=",
+      "Fingerprint": "wc74ynze0e",
+      "Integrity": "QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/scopedcss/bundle/MvcBooks.styles.css"
@@ -5785,8 +5785,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "ScopedCss",
       "AssetTraitValue": "ApplicationBundle",
-      "Fingerprint": "dgycb8tcwm",
-      "Integrity": "k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A=",
+      "Fingerprint": "qqot4at1li",
+      "Integrity": "gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/scopedcss/bundle/MvcBooks.styles.css"
@@ -5806,8 +5806,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "ScopedCss",
       "AssetTraitValue": "ProjectBundle",
-      "Fingerprint": "dgycb8tcwm",
-      "Integrity": "k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A=",
+      "Fingerprint": "qqot4at1li",
+      "Integrity": "gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/scopedcss/projectbundle/MvcBooks.bundle.scp.css"
@@ -5890,8 +5890,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "ilm5nbr3ot",
-      "Integrity": "WgucWRW0QSOnjWXe+q2OchRASJJ+hwEOz52X88yQO1s=",
+      "Fingerprint": "nhji6g2ieo",
+      "Integrity": "1SbyJQ5P5kvBdM1QWSxUpyk9eoxGNDOo+o1RvqbrZok=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/css/site.css"
@@ -6002,12 +6002,12 @@
       "OriginalItemSpec": "wwwroot/images/erdiagram.png"
     },
     {
-      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/hero-background.jpg",
+      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/hero-background.webp",
       "SourceId": "MvcBooks",
       "SourceType": "Discovered",
       "ContentRoot": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/",
       "BasePath": "_content/MvcBooks",
-      "RelativePath": "images/hero-background#[.{fingerprint}]?.jpg",
+      "RelativePath": "images/hero-background#[.{fingerprint}]?.webp",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -6016,19 +6016,19 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "g1wfb3sl3e",
-      "Integrity": "9CaBPxwY8CZ2vOjcNJE2kxGUZCQySF0T94zmLzCxt3o=",
+      "Fingerprint": "4ch7dnhsaj",
+      "Integrity": "hEx8AQ6/VhNONhuNtkzZWf/xIOcECaLGyoHNr7LadPU=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/images/hero-background.jpg"
+      "OriginalItemSpec": "wwwroot/images/hero-background.webp"
     },
     {
-      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/logo.png",
+      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/logo.webp",
       "SourceId": "MvcBooks",
       "SourceType": "Discovered",
       "ContentRoot": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/",
       "BasePath": "_content/MvcBooks",
-      "RelativePath": "images/logo#[.{fingerprint}]?.png",
+      "RelativePath": "images/logo#[.{fingerprint}]?.webp",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -6037,19 +6037,19 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "50elrdzscm",
-      "Integrity": "20ZgkcNRLdHZFwpp7Y51KPhyAk3L5l56PLenuppP3Nc=",
+      "Fingerprint": "hg87ilaqey",
+      "Integrity": "b/O+LGE4Ts7AgiljhJBvkEfiB9Ao//Lxa0BDbvhGpmM=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/images/logo.png"
+      "OriginalItemSpec": "wwwroot/images/logo.webp"
     },
     {
-      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-cover.png",
+      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-cover.webp",
       "SourceId": "MvcBooks",
       "SourceType": "Discovered",
       "ContentRoot": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/",
       "BasePath": "_content/MvcBooks",
-      "RelativePath": "images/placeholder-cover#[.{fingerprint}]?.png",
+      "RelativePath": "images/placeholder-cover#[.{fingerprint}]?.webp",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -6058,19 +6058,19 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "f557zvxqgv",
-      "Integrity": "04T/AME6y6AhEFTvaZ2JQnWASmv3OFIRDJD6KTT5qew=",
+      "Fingerprint": "ngd8ggkatj",
+      "Integrity": "2flw8zGm8wWkG4HGCM2CodMzu4GPiEEM1uz8XAY6Fd0=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/images/placeholder-cover.png"
+      "OriginalItemSpec": "wwwroot/images/placeholder-cover.webp"
     },
     {
-      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-profile.png",
+      "Identity": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-profile.webp",
       "SourceId": "MvcBooks",
       "SourceType": "Discovered",
       "ContentRoot": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/",
       "BasePath": "_content/MvcBooks",
-      "RelativePath": "images/placeholder-profile#[.{fingerprint}]?.png",
+      "RelativePath": "images/placeholder-profile#[.{fingerprint}]?.webp",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -6079,11 +6079,11 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "wtgwkd5h07",
-      "Integrity": "NJXbaAgc/WcHIakAiUS81PWHBLg5IT+3pukN4gBvALA=",
+      "Fingerprint": "1f5a6dwrp3",
+      "Integrity": "E+zsSYjjg7vVCrcZtiqDp24RVJivLP7mzHNpxl3q3Cw=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/images/placeholder-profile.png"
+      "OriginalItemSpec": "wwwroot/images/placeholder-profile.webp"
     },
     {
       "Identity": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/profiles/4dafbf72-3b9c-4f24-be15-d434d4d94424_e5e545a9-760f-4e90-8ca1-91405ac695a3.png",
@@ -6142,8 +6142,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "75lfwsl4ln",
-      "Integrity": "NYdQUsJuPN/RJUEIl/62HKiEP8kcFPwKlpd5tUPHmWY=",
+      "Fingerprint": "fo16v8ge8p",
+      "Integrity": "/2x4ANphswd7WcmiZ2kij7ai/5vX0vPRHVd1seUxoPw=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/js/site.js"
@@ -15906,12 +15906,12 @@
     },
     {
       "Route": "css/site.css",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-ilm5nbr3ot.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-nhji6g2ieo.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000294117647"
+          "Quality": "0.000157728707"
         }
       ],
       "ResponseHeaders": [
@@ -15921,15 +15921,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3399"
+          "Value": "6339"
         },
         {
           "Name": "ETag",
-          "Value": "\"syPMFgXERuTRqWz2MTOeNyYLYgN0ERHv9J634x+u+kQ=\""
+          "Value": "\"POAPkIQgvJXlyp0SCPTwmwEtCnQqlHPRYo611CxXdDk=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 02:38:38 GMT"
+          "Value": "Fri, 18 Apr 2025 16:19:08 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -15949,13 +15949,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"WgucWRW0QSOnjWXe+q2OchRASJJ+hwEOz52X88yQO1s=\""
+          "Value": "W/\"1SbyJQ5P5kvBdM1QWSxUpyk9eoxGNDOo+o1RvqbrZok=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-WgucWRW0QSOnjWXe+q2OchRASJJ+hwEOz52X88yQO1s="
+          "Value": "sha256-1SbyJQ5P5kvBdM1QWSxUpyk9eoxGNDOo+o1RvqbrZok="
         }
       ]
     },
@@ -15970,7 +15970,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "13435"
+          "Value": "29068"
         },
         {
           "Name": "Content-Type",
@@ -15978,11 +15978,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"WgucWRW0QSOnjWXe+q2OchRASJJ+hwEOz52X88yQO1s=\""
+          "Value": "\"1SbyJQ5P5kvBdM1QWSxUpyk9eoxGNDOo+o1RvqbrZok=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 02:38:38 GMT"
+          "Value": "Fri, 18 Apr 2025 16:19:08 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -15992,13 +15992,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-WgucWRW0QSOnjWXe+q2OchRASJJ+hwEOz52X88yQO1s="
+          "Value": "sha256-1SbyJQ5P5kvBdM1QWSxUpyk9eoxGNDOo+o1RvqbrZok="
         }
       ]
     },
     {
       "Route": "css/site.css.gz",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-ilm5nbr3ot.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-nhji6g2ieo.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -16007,7 +16007,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3399"
+          "Value": "6339"
         },
         {
           "Name": "Content-Type",
@@ -16015,11 +16015,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"syPMFgXERuTRqWz2MTOeNyYLYgN0ERHv9J634x+u+kQ=\""
+          "Value": "\"POAPkIQgvJXlyp0SCPTwmwEtCnQqlHPRYo611CxXdDk=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 02:38:38 GMT"
+          "Value": "Fri, 18 Apr 2025 16:19:08 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -16037,18 +16037,18 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-syPMFgXERuTRqWz2MTOeNyYLYgN0ERHv9J634x+u+kQ="
+          "Value": "sha256-POAPkIQgvJXlyp0SCPTwmwEtCnQqlHPRYo611CxXdDk="
         }
       ]
     },
     {
-      "Route": "css/site.ilm5nbr3ot.css",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-ilm5nbr3ot.gz",
+      "Route": "css/site.nhji6g2ieo.css",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-nhji6g2ieo.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000294117647"
+          "Quality": "0.000157728707"
         }
       ],
       "ResponseHeaders": [
@@ -16058,15 +16058,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3399"
+          "Value": "6339"
         },
         {
           "Name": "ETag",
-          "Value": "\"syPMFgXERuTRqWz2MTOeNyYLYgN0ERHv9J634x+u+kQ=\""
+          "Value": "\"POAPkIQgvJXlyp0SCPTwmwEtCnQqlHPRYo611CxXdDk=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 02:38:38 GMT"
+          "Value": "Fri, 18 Apr 2025 16:19:08 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -16086,13 +16086,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"WgucWRW0QSOnjWXe+q2OchRASJJ+hwEOz52X88yQO1s=\""
+          "Value": "W/\"1SbyJQ5P5kvBdM1QWSxUpyk9eoxGNDOo+o1RvqbrZok=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "ilm5nbr3ot"
+          "Value": "nhji6g2ieo"
         },
         {
           "Name": "label",
@@ -16100,12 +16100,12 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-WgucWRW0QSOnjWXe+q2OchRASJJ+hwEOz52X88yQO1s="
+          "Value": "sha256-1SbyJQ5P5kvBdM1QWSxUpyk9eoxGNDOo+o1RvqbrZok="
         }
       ]
     },
     {
-      "Route": "css/site.ilm5nbr3ot.css",
+      "Route": "css/site.nhji6g2ieo.css",
       "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/css/site.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -16115,7 +16115,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "13435"
+          "Value": "29068"
         },
         {
           "Name": "Content-Type",
@@ -16123,11 +16123,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"WgucWRW0QSOnjWXe+q2OchRASJJ+hwEOz52X88yQO1s=\""
+          "Value": "\"1SbyJQ5P5kvBdM1QWSxUpyk9eoxGNDOo+o1RvqbrZok=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 02:38:38 GMT"
+          "Value": "Fri, 18 Apr 2025 16:19:08 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -16137,7 +16137,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "ilm5nbr3ot"
+          "Value": "nhji6g2ieo"
         },
         {
           "Name": "label",
@@ -16145,13 +16145,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-WgucWRW0QSOnjWXe+q2OchRASJJ+hwEOz52X88yQO1s="
+          "Value": "sha256-1SbyJQ5P5kvBdM1QWSxUpyk9eoxGNDOo+o1RvqbrZok="
         }
       ]
     },
     {
-      "Route": "css/site.ilm5nbr3ot.css.gz",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-ilm5nbr3ot.gz",
+      "Route": "css/site.nhji6g2ieo.css.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/566rav5za2-nhji6g2ieo.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -16160,7 +16160,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3399"
+          "Value": "6339"
         },
         {
           "Name": "Content-Type",
@@ -16168,11 +16168,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"syPMFgXERuTRqWz2MTOeNyYLYgN0ERHv9J634x+u+kQ=\""
+          "Value": "\"POAPkIQgvJXlyp0SCPTwmwEtCnQqlHPRYo611CxXdDk=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 15 Apr 2025 02:38:38 GMT"
+          "Value": "Fri, 18 Apr 2025 16:19:08 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -16190,7 +16190,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "ilm5nbr3ot"
+          "Value": "nhji6g2ieo"
         },
         {
           "Name": "label",
@@ -16198,7 +16198,7 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-syPMFgXERuTRqWz2MTOeNyYLYgN0ERHv9J634x+u+kQ="
+          "Value": "sha256-POAPkIQgvJXlyp0SCPTwmwEtCnQqlHPRYo611CxXdDk="
         }
       ]
     },
@@ -25397,8 +25397,8 @@
       ]
     },
     {
-      "Route": "images/hero-background.g1wfb3sl3e.jpg",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/hero-background.jpg",
+      "Route": "images/hero-background.4ch7dnhsaj.webp",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/hero-background.webp",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -25407,19 +25407,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "217477"
+          "Value": "16636"
         },
         {
           "Name": "Content-Type",
-          "Value": "image/jpeg"
+          "Value": "image/webp"
         },
         {
           "Name": "ETag",
-          "Value": "\"9CaBPxwY8CZ2vOjcNJE2kxGUZCQySF0T94zmLzCxt3o=\""
+          "Value": "\"hEx8AQ6/VhNONhuNtkzZWf/xIOcECaLGyoHNr7LadPU=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 23:33:51 GMT"
+          "Value": "Wed, 16 Apr 2025 11:49:09 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -25429,21 +25429,21 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "g1wfb3sl3e"
+          "Value": "4ch7dnhsaj"
         },
         {
           "Name": "label",
-          "Value": "images/hero-background.jpg"
+          "Value": "images/hero-background.webp"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-9CaBPxwY8CZ2vOjcNJE2kxGUZCQySF0T94zmLzCxt3o="
+          "Value": "sha256-hEx8AQ6/VhNONhuNtkzZWf/xIOcECaLGyoHNr7LadPU="
         }
       ]
     },
     {
-      "Route": "images/hero-background.jpg",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/hero-background.jpg",
+      "Route": "images/hero-background.webp",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/hero-background.webp",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -25452,19 +25452,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "217477"
+          "Value": "16636"
         },
         {
           "Name": "Content-Type",
-          "Value": "image/jpeg"
+          "Value": "image/webp"
         },
         {
           "Name": "ETag",
-          "Value": "\"9CaBPxwY8CZ2vOjcNJE2kxGUZCQySF0T94zmLzCxt3o=\""
+          "Value": "\"hEx8AQ6/VhNONhuNtkzZWf/xIOcECaLGyoHNr7LadPU=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 23:33:51 GMT"
+          "Value": "Wed, 16 Apr 2025 11:49:09 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -25474,13 +25474,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-9CaBPxwY8CZ2vOjcNJE2kxGUZCQySF0T94zmLzCxt3o="
+          "Value": "sha256-hEx8AQ6/VhNONhuNtkzZWf/xIOcECaLGyoHNr7LadPU="
         }
       ]
     },
     {
-      "Route": "images/logo.50elrdzscm.png",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/logo.png",
+      "Route": "images/logo.hg87ilaqey.webp",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/logo.webp",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -25489,19 +25489,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "662790"
+          "Value": "55020"
         },
         {
           "Name": "Content-Type",
-          "Value": "image/png"
+          "Value": "image/webp"
         },
         {
           "Name": "ETag",
-          "Value": "\"20ZgkcNRLdHZFwpp7Y51KPhyAk3L5l56PLenuppP3Nc=\""
+          "Value": "\"b/O+LGE4Ts7AgiljhJBvkEfiB9Ao//Lxa0BDbvhGpmM=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 23:52:28 GMT"
+          "Value": "Wed, 16 Apr 2025 11:50:49 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -25511,21 +25511,21 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "50elrdzscm"
+          "Value": "hg87ilaqey"
         },
         {
           "Name": "label",
-          "Value": "images/logo.png"
+          "Value": "images/logo.webp"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-20ZgkcNRLdHZFwpp7Y51KPhyAk3L5l56PLenuppP3Nc="
+          "Value": "sha256-b/O+LGE4Ts7AgiljhJBvkEfiB9Ao//Lxa0BDbvhGpmM="
         }
       ]
     },
     {
-      "Route": "images/logo.png",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/logo.png",
+      "Route": "images/logo.webp",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/logo.webp",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -25534,19 +25534,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "662790"
+          "Value": "55020"
         },
         {
           "Name": "Content-Type",
-          "Value": "image/png"
+          "Value": "image/webp"
         },
         {
           "Name": "ETag",
-          "Value": "\"20ZgkcNRLdHZFwpp7Y51KPhyAk3L5l56PLenuppP3Nc=\""
+          "Value": "\"b/O+LGE4Ts7AgiljhJBvkEfiB9Ao//Lxa0BDbvhGpmM=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 23:52:28 GMT"
+          "Value": "Wed, 16 Apr 2025 11:50:49 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -25556,13 +25556,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-20ZgkcNRLdHZFwpp7Y51KPhyAk3L5l56PLenuppP3Nc="
+          "Value": "sha256-b/O+LGE4Ts7AgiljhJBvkEfiB9Ao//Lxa0BDbvhGpmM="
         }
       ]
     },
     {
-      "Route": "images/placeholder-cover.f557zvxqgv.png",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-cover.png",
+      "Route": "images/placeholder-cover.ngd8ggkatj.webp",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-cover.webp",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -25571,19 +25571,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1132834"
+          "Value": "12174"
         },
         {
           "Name": "Content-Type",
-          "Value": "image/png"
+          "Value": "image/webp"
         },
         {
           "Name": "ETag",
-          "Value": "\"04T/AME6y6AhEFTvaZ2JQnWASmv3OFIRDJD6KTT5qew=\""
+          "Value": "\"2flw8zGm8wWkG4HGCM2CodMzu4GPiEEM1uz8XAY6Fd0=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 12 Apr 2025 00:55:22 GMT"
+          "Value": "Wed, 16 Apr 2025 11:51:57 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -25593,21 +25593,21 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "f557zvxqgv"
+          "Value": "ngd8ggkatj"
         },
         {
           "Name": "label",
-          "Value": "images/placeholder-cover.png"
+          "Value": "images/placeholder-cover.webp"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-04T/AME6y6AhEFTvaZ2JQnWASmv3OFIRDJD6KTT5qew="
+          "Value": "sha256-2flw8zGm8wWkG4HGCM2CodMzu4GPiEEM1uz8XAY6Fd0="
         }
       ]
     },
     {
-      "Route": "images/placeholder-cover.png",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-cover.png",
+      "Route": "images/placeholder-cover.webp",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-cover.webp",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -25616,19 +25616,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1132834"
+          "Value": "12174"
         },
         {
           "Name": "Content-Type",
-          "Value": "image/png"
+          "Value": "image/webp"
         },
         {
           "Name": "ETag",
-          "Value": "\"04T/AME6y6AhEFTvaZ2JQnWASmv3OFIRDJD6KTT5qew=\""
+          "Value": "\"2flw8zGm8wWkG4HGCM2CodMzu4GPiEEM1uz8XAY6Fd0=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 12 Apr 2025 00:55:22 GMT"
+          "Value": "Wed, 16 Apr 2025 11:51:57 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -25638,13 +25638,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-04T/AME6y6AhEFTvaZ2JQnWASmv3OFIRDJD6KTT5qew="
+          "Value": "sha256-2flw8zGm8wWkG4HGCM2CodMzu4GPiEEM1uz8XAY6Fd0="
         }
       ]
     },
     {
-      "Route": "images/placeholder-profile.png",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-profile.png",
+      "Route": "images/placeholder-profile.1f5a6dwrp3.webp",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-profile.webp",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -25653,56 +25653,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1519119"
+          "Value": "12482"
         },
         {
           "Name": "Content-Type",
-          "Value": "image/png"
+          "Value": "image/webp"
         },
         {
           "Name": "ETag",
-          "Value": "\"NJXbaAgc/WcHIakAiUS81PWHBLg5IT+3pukN4gBvALA=\""
+          "Value": "\"E+zsSYjjg7vVCrcZtiqDp24RVJivLP7mzHNpxl3q3Cw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sun, 13 Apr 2025 22:31:41 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=3600, must-revalidate"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-NJXbaAgc/WcHIakAiUS81PWHBLg5IT+3pukN4gBvALA="
-        }
-      ]
-    },
-    {
-      "Route": "images/placeholder-profile.wtgwkd5h07.png",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-profile.png",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "1519119"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "image/png"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"NJXbaAgc/WcHIakAiUS81PWHBLg5IT+3pukN4gBvALA=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sun, 13 Apr 2025 22:31:41 GMT"
+          "Value": "Wed, 16 Apr 2025 11:53:46 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -25712,15 +25675,52 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "wtgwkd5h07"
+          "Value": "1f5a6dwrp3"
         },
         {
           "Name": "label",
-          "Value": "images/placeholder-profile.png"
+          "Value": "images/placeholder-profile.webp"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-NJXbaAgc/WcHIakAiUS81PWHBLg5IT+3pukN4gBvALA="
+          "Value": "sha256-E+zsSYjjg7vVCrcZtiqDp24RVJivLP7mzHNpxl3q3Cw="
+        }
+      ]
+    },
+    {
+      "Route": "images/placeholder-profile.webp",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-profile.webp",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "12482"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/webp"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"E+zsSYjjg7vVCrcZtiqDp24RVJivLP7mzHNpxl3q3Cw=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 16 Apr 2025 11:53:46 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-E+zsSYjjg7vVCrcZtiqDp24RVJivLP7mzHNpxl3q3Cw="
         }
       ]
     },
@@ -25889,13 +25889,13 @@
       ]
     },
     {
-      "Route": "js/site.75lfwsl4ln.js",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-75lfwsl4ln.gz",
+      "Route": "js/site.fo16v8ge8p.js",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-fo16v8ge8p.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000773993808"
+          "Quality": "0.000216825672"
         }
       ],
       "ResponseHeaders": [
@@ -25905,15 +25905,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1291"
+          "Value": "4611"
         },
         {
           "Name": "ETag",
-          "Value": "\"wJ+oYUYH3HwaD8cJSM8JXKvZR5ikII6JiovZAgcyhBU=\""
+          "Value": "\"Tmu71NMdiFw/tXF8sBVj6KYAmpoajmHQ9k500FUMzgI=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:43:23 GMT"
+          "Value": "Fri, 18 Apr 2025 16:42:09 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -25933,13 +25933,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"NYdQUsJuPN/RJUEIl/62HKiEP8kcFPwKlpd5tUPHmWY=\""
+          "Value": "W/\"/2x4ANphswd7WcmiZ2kij7ai/5vX0vPRHVd1seUxoPw=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "75lfwsl4ln"
+          "Value": "fo16v8ge8p"
         },
         {
           "Name": "label",
@@ -25947,12 +25947,12 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-NYdQUsJuPN/RJUEIl/62HKiEP8kcFPwKlpd5tUPHmWY="
+          "Value": "sha256-/2x4ANphswd7WcmiZ2kij7ai/5vX0vPRHVd1seUxoPw="
         }
       ]
     },
     {
-      "Route": "js/site.75lfwsl4ln.js",
+      "Route": "js/site.fo16v8ge8p.js",
       "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/js/site.js",
       "Selectors": [],
       "ResponseHeaders": [
@@ -25962,7 +25962,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "4010"
+          "Value": "17581"
         },
         {
           "Name": "Content-Type",
@@ -25970,11 +25970,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"NYdQUsJuPN/RJUEIl/62HKiEP8kcFPwKlpd5tUPHmWY=\""
+          "Value": "\"/2x4ANphswd7WcmiZ2kij7ai/5vX0vPRHVd1seUxoPw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:43:23 GMT"
+          "Value": "Fri, 18 Apr 2025 16:42:09 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -25984,7 +25984,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "75lfwsl4ln"
+          "Value": "fo16v8ge8p"
         },
         {
           "Name": "label",
@@ -25992,13 +25992,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-NYdQUsJuPN/RJUEIl/62HKiEP8kcFPwKlpd5tUPHmWY="
+          "Value": "sha256-/2x4ANphswd7WcmiZ2kij7ai/5vX0vPRHVd1seUxoPw="
         }
       ]
     },
     {
-      "Route": "js/site.75lfwsl4ln.js.gz",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-75lfwsl4ln.gz",
+      "Route": "js/site.fo16v8ge8p.js.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-fo16v8ge8p.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -26007,7 +26007,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1291"
+          "Value": "4611"
         },
         {
           "Name": "Content-Type",
@@ -26015,11 +26015,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"wJ+oYUYH3HwaD8cJSM8JXKvZR5ikII6JiovZAgcyhBU=\""
+          "Value": "\"Tmu71NMdiFw/tXF8sBVj6KYAmpoajmHQ9k500FUMzgI=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:43:23 GMT"
+          "Value": "Fri, 18 Apr 2025 16:42:09 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -26037,7 +26037,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "75lfwsl4ln"
+          "Value": "fo16v8ge8p"
         },
         {
           "Name": "label",
@@ -26045,7 +26045,7 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-wJ+oYUYH3HwaD8cJSM8JXKvZR5ikII6JiovZAgcyhBU="
+          "Value": "sha256-Tmu71NMdiFw/tXF8sBVj6KYAmpoajmHQ9k500FUMzgI="
         }
       ]
     },
@@ -26088,12 +26088,12 @@
     },
     {
       "Route": "js/site.js",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-75lfwsl4ln.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-fo16v8ge8p.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.000773993808"
+          "Quality": "0.000216825672"
         }
       ],
       "ResponseHeaders": [
@@ -26103,15 +26103,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1291"
+          "Value": "4611"
         },
         {
           "Name": "ETag",
-          "Value": "\"wJ+oYUYH3HwaD8cJSM8JXKvZR5ikII6JiovZAgcyhBU=\""
+          "Value": "\"Tmu71NMdiFw/tXF8sBVj6KYAmpoajmHQ9k500FUMzgI=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:43:23 GMT"
+          "Value": "Fri, 18 Apr 2025 16:42:09 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -26131,13 +26131,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"NYdQUsJuPN/RJUEIl/62HKiEP8kcFPwKlpd5tUPHmWY=\""
+          "Value": "W/\"/2x4ANphswd7WcmiZ2kij7ai/5vX0vPRHVd1seUxoPw=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-NYdQUsJuPN/RJUEIl/62HKiEP8kcFPwKlpd5tUPHmWY="
+          "Value": "sha256-/2x4ANphswd7WcmiZ2kij7ai/5vX0vPRHVd1seUxoPw="
         }
       ]
     },
@@ -26152,7 +26152,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "4010"
+          "Value": "17581"
         },
         {
           "Name": "Content-Type",
@@ -26160,11 +26160,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"NYdQUsJuPN/RJUEIl/62HKiEP8kcFPwKlpd5tUPHmWY=\""
+          "Value": "\"/2x4ANphswd7WcmiZ2kij7ai/5vX0vPRHVd1seUxoPw=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:43:23 GMT"
+          "Value": "Fri, 18 Apr 2025 16:42:09 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -26174,13 +26174,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-NYdQUsJuPN/RJUEIl/62HKiEP8kcFPwKlpd5tUPHmWY="
+          "Value": "sha256-/2x4ANphswd7WcmiZ2kij7ai/5vX0vPRHVd1seUxoPw="
         }
       ]
     },
     {
       "Route": "js/site.js.gz",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-75lfwsl4ln.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/mts4sagg3w-fo16v8ge8p.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -26189,7 +26189,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1291"
+          "Value": "4611"
         },
         {
           "Name": "Content-Type",
@@ -26197,11 +26197,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"wJ+oYUYH3HwaD8cJSM8JXKvZR5ikII6JiovZAgcyhBU=\""
+          "Value": "\"Tmu71NMdiFw/tXF8sBVj6KYAmpoajmHQ9k500FUMzgI=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Mon, 14 Apr 2025 03:43:23 GMT"
+          "Value": "Fri, 18 Apr 2025 16:42:09 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -26219,7 +26219,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-wJ+oYUYH3HwaD8cJSM8JXKvZR5ikII6JiovZAgcyhBU="
+          "Value": "sha256-Tmu71NMdiFw/tXF8sBVj6KYAmpoajmHQ9k500FUMzgI="
         }
       ]
     },
@@ -96531,12 +96531,12 @@
     },
     {
       "Route": "MvcBooks.bundle.scp.css",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/64jhpjs4u9-dgycb8tcwm.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/64jhpjs4u9-qqot4at1li.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.001869158879"
+          "Quality": "0.001930501931"
         }
       ],
       "ResponseHeaders": [
@@ -96546,15 +96546,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "534"
+          "Value": "517"
         },
         {
           "Name": "ETag",
-          "Value": "\"zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc=\""
+          "Value": "\"QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -96574,13 +96574,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A=\""
+          "Value": "W/\"gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A="
+          "Value": "sha256-gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI="
         }
       ]
     },
@@ -96595,7 +96595,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1077"
+          "Value": "943"
         },
         {
           "Name": "Content-Type",
@@ -96603,11 +96603,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A=\""
+          "Value": "\"gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -96617,13 +96617,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A="
+          "Value": "sha256-gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI="
         }
       ]
     },
     {
       "Route": "MvcBooks.bundle.scp.css.gz",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/64jhpjs4u9-dgycb8tcwm.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/64jhpjs4u9-qqot4at1li.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -96632,7 +96632,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "534"
+          "Value": "517"
         },
         {
           "Name": "Content-Type",
@@ -96640,11 +96640,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc=\""
+          "Value": "\"QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -96662,18 +96662,18 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc="
+          "Value": "sha256-QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U="
         }
       ]
     },
     {
-      "Route": "MvcBooks.dgycb8tcwm.bundle.scp.css",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/64jhpjs4u9-dgycb8tcwm.gz",
+      "Route": "MvcBooks.qqot4at1li.bundle.scp.css",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/64jhpjs4u9-qqot4at1li.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.001869158879"
+          "Quality": "0.001930501931"
         }
       ],
       "ResponseHeaders": [
@@ -96683,15 +96683,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "534"
+          "Value": "517"
         },
         {
           "Name": "ETag",
-          "Value": "\"zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc=\""
+          "Value": "\"QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -96711,13 +96711,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A=\""
+          "Value": "W/\"gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "dgycb8tcwm"
+          "Value": "qqot4at1li"
         },
         {
           "Name": "label",
@@ -96725,12 +96725,12 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A="
+          "Value": "sha256-gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI="
         }
       ]
     },
     {
-      "Route": "MvcBooks.dgycb8tcwm.bundle.scp.css",
+      "Route": "MvcBooks.qqot4at1li.bundle.scp.css",
       "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/scopedcss/projectbundle/MvcBooks.bundle.scp.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -96740,7 +96740,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1077"
+          "Value": "943"
         },
         {
           "Name": "Content-Type",
@@ -96748,11 +96748,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A=\""
+          "Value": "\"gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -96762,7 +96762,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "dgycb8tcwm"
+          "Value": "qqot4at1li"
         },
         {
           "Name": "label",
@@ -96770,13 +96770,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A="
+          "Value": "sha256-gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI="
         }
       ]
     },
     {
-      "Route": "MvcBooks.dgycb8tcwm.bundle.scp.css.gz",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/64jhpjs4u9-dgycb8tcwm.gz",
+      "Route": "MvcBooks.qqot4at1li.bundle.scp.css.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/64jhpjs4u9-qqot4at1li.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -96785,7 +96785,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "534"
+          "Value": "517"
         },
         {
           "Name": "Content-Type",
@@ -96793,11 +96793,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc=\""
+          "Value": "\"QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -96815,7 +96815,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "dgycb8tcwm"
+          "Value": "qqot4at1li"
         },
         {
           "Name": "label",
@@ -96823,18 +96823,18 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc="
+          "Value": "sha256-QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U="
         }
       ]
     },
     {
-      "Route": "MvcBooks.dgycb8tcwm.styles.css",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/zh7fo5q8w9-dgycb8tcwm.gz",
+      "Route": "MvcBooks.qqot4at1li.styles.css",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/zh7fo5q8w9-qqot4at1li.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.001869158879"
+          "Quality": "0.001930501931"
         }
       ],
       "ResponseHeaders": [
@@ -96844,15 +96844,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "534"
+          "Value": "517"
         },
         {
           "Name": "ETag",
-          "Value": "\"zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc=\""
+          "Value": "\"QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -96872,13 +96872,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A=\""
+          "Value": "W/\"gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "dgycb8tcwm"
+          "Value": "qqot4at1li"
         },
         {
           "Name": "label",
@@ -96886,12 +96886,12 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A="
+          "Value": "sha256-gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI="
         }
       ]
     },
     {
-      "Route": "MvcBooks.dgycb8tcwm.styles.css",
+      "Route": "MvcBooks.qqot4at1li.styles.css",
       "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/scopedcss/bundle/MvcBooks.styles.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -96901,7 +96901,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1077"
+          "Value": "943"
         },
         {
           "Name": "Content-Type",
@@ -96909,11 +96909,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A=\""
+          "Value": "\"gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -96923,7 +96923,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "dgycb8tcwm"
+          "Value": "qqot4at1li"
         },
         {
           "Name": "label",
@@ -96931,13 +96931,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A="
+          "Value": "sha256-gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI="
         }
       ]
     },
     {
-      "Route": "MvcBooks.dgycb8tcwm.styles.css.gz",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/zh7fo5q8w9-dgycb8tcwm.gz",
+      "Route": "MvcBooks.qqot4at1li.styles.css.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/zh7fo5q8w9-qqot4at1li.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -96946,7 +96946,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "534"
+          "Value": "517"
         },
         {
           "Name": "Content-Type",
@@ -96954,11 +96954,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc=\""
+          "Value": "\"QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -96976,7 +96976,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "dgycb8tcwm"
+          "Value": "qqot4at1li"
         },
         {
           "Name": "label",
@@ -96984,18 +96984,18 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc="
+          "Value": "sha256-QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U="
         }
       ]
     },
     {
       "Route": "MvcBooks.styles.css",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/zh7fo5q8w9-dgycb8tcwm.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/zh7fo5q8w9-qqot4at1li.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.001869158879"
+          "Quality": "0.001930501931"
         }
       ],
       "ResponseHeaders": [
@@ -97005,15 +97005,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "534"
+          "Value": "517"
         },
         {
           "Name": "ETag",
-          "Value": "\"zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc=\""
+          "Value": "\"QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -97033,13 +97033,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A=\""
+          "Value": "W/\"gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A="
+          "Value": "sha256-gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI="
         }
       ]
     },
@@ -97054,7 +97054,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "1077"
+          "Value": "943"
         },
         {
           "Name": "Content-Type",
@@ -97062,11 +97062,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A=\""
+          "Value": "\"gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -97076,13 +97076,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-k+vP1RxWP0DftVFOGzy2cnnfP7y7Q0RHUH2m2rPBG9A="
+          "Value": "sha256-gh6mudPiSeRG1iPoDTISuYdTmb4QYu+Bus0nrhrSetI="
         }
       ]
     },
     {
       "Route": "MvcBooks.styles.css.gz",
-      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/zh7fo5q8w9-dgycb8tcwm.gz",
+      "AssetFile": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/compressed/zh7fo5q8w9-qqot4at1li.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -97091,7 +97091,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "534"
+          "Value": "517"
         },
         {
           "Name": "Content-Type",
@@ -97099,11 +97099,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc=\""
+          "Value": "\"QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 11 Apr 2025 19:24:27 GMT"
+          "Value": "Fri, 18 Apr 2025 10:10:33 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -97121,7 +97121,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-zsOASJgIjR4DV34bUwKvSmMFAZIJR8A+QCLSuAkHosc="
+          "Value": "sha256-QMxNHjQG+NJEGOW+zzppzDUHDX4spseQChi6+B6/99U="
         }
       ]
     }

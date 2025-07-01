@@ -33,10 +33,10 @@
                     <div class="col">
                         <div class="book-item"> @* Reuse existing book-item style *@
                             <a asp-controller="Books" asp-action="Details" asp-route-id="@item.Id" title="@item.Title">
-                                <img src="@(string.IsNullOrEmpty(item.CoverImageUrl) ? "/images/placeholder-cover.png" : item.CoverImageUrl)"
+                                <img src="@(string.IsNullOrEmpty(item.CoverImageUrl) ? "/images/placeholder-cover.webp" : item.CoverImageUrl)"
                                      class="book-cover"
                                      alt="Cover for @item.Title"
-                                     onerror="this.onerror=null; this.src='/images/placeholder-cover.png';" />
+                                     onerror="this.onerror=null; this.src='/images/placeholder-cover.webp';" />
                                 <span class="book-title-sm">@item.Title</span>
                                 @* Optional: Add author here if desired *@
                                 @* <span class="book-author-sm text-muted small px-3 pb-2 d-block">@item.Author</span> *@

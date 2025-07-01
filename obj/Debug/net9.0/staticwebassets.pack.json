@@ -2,7 +2,7 @@
   "Files": [
     {
       "Id": "/Users/fady/Desktop/wdt/MvcBooks/obj/Debug/net9.0/scopedcss/projectbundle/MvcBooks.bundle.scp.css",
-      "PackagePath": "staticwebassets/MvcBooks.dgycb8tcwm.bundle.scp.css"
+      "PackagePath": "staticwebassets/MvcBooks.qqot4at1li.bundle.scp.css"
     },
     {
       "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/books/1c607cd3-1718-4759-942c-681a93853231.epub",
@@ -41,20 +41,20 @@
       "PackagePath": "staticwebassets/images/erdiagram.png"
     },
     {
-      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/hero-background.jpg",
-      "PackagePath": "staticwebassets/images/hero-background.jpg"
+      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/hero-background.webp",
+      "PackagePath": "staticwebassets/images/hero-background.webp"
     },
     {
-      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/logo.png",
-      "PackagePath": "staticwebassets/images/logo.png"
+      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/logo.webp",
+      "PackagePath": "staticwebassets/images/logo.webp"
     },
     {
-      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-cover.png",
-      "PackagePath": "staticwebassets/images/placeholder-cover.png"
+      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-cover.webp",
+      "PackagePath": "staticwebassets/images/placeholder-cover.webp"
     },
     {
-      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-profile.png",
-      "PackagePath": "staticwebassets/images/placeholder-profile.png"
+      "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/placeholder-profile.webp",
+      "PackagePath": "staticwebassets/images/placeholder-profile.webp"
     },
     {
       "Id": "/Users/fady/Desktop/wdt/MvcBooks/wwwroot/images/profiles/4dafbf72-3b9c-4f24-be15-d434d4d94424_e5e545a9-760f-4e90-8ca1-91405ac695a3.png",

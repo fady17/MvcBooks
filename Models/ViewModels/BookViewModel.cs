@@ -22,6 +22,8 @@ namespace MvcBooks.Models.ViewModels
         [Display(Name = "Current Cover")]
         public string? ExistingCoverUrl { get; set; } 
 
+        public bool IsCoverUrlFallback { get; set; } = false;
+
         [Display(Name = "Publication Date")]
         [DataType(DataType.Date)]
         public DateTime PublishedDate { get; set; } = DateTime.Now;
