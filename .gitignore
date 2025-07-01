@@ -125,11 +125,11 @@ wwwroot/images/covers/*
 wwwroot/books/*
 
 # ... But DO NOT ignore placeholder files if you have them
-!wwwroot/images/covers/placeholder-cover.png
-!wwwroot/images/placeholder-profile.png
+!wwwroot/images/covers/placeholder-cover.webp
+!wwwroot/images/placeholder-profile.webp
 !wwwroot/images/erdiagram.png
 !wwwroot/images/hero-background.jpg
-!wwwroot/images/logo.png
+!wwwroot/images/logo.webp
 
 docker-compose.override.yml
 .dockerignore

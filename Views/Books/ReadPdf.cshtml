@@ -1,143 +1,461 @@
-@model MvcBooks.Models.Book // Model contains Id and Title passed from Controller
+@model MvcBooks.Models.Book
 @using System.Text.Json
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Http.Extensions
+@using MvcBooks.Common
+
+@inject SignInManager<User> SignInManager
 
 @{
-    ViewData["Title"] = "Read PDF - " + Model.Title; // Use Model.Title
-    Layout = "_Layout";
+ViewData["Title"] = "Read PDF - " + (Model.Title ?? "Untitled");
+Layout = "_Layout";
 
-    // --- Generate URL to the GetPdf action using the Model's Id ---
-    string? pdfStreamUrl = Url.Action("GetPdf", "Books", new { id = Model.Id });
-    // --- End URL Generation ---
+string? pdfStreamUrl = Url.Action("GetPdf", "Books", new { id = Model.Id });
+string returnUrl = UriHelper.GetEncodedUrl(Context.Request);
+
 }
 
 @section Styles {
-    <style>
-        html, body { height: 100%; overflow: hidden; background-color: #525659; }
-        main[role="main"] { height: calc(100vh - 56px - 60px); padding: 0 !important; margin: 0 !important; position: relative; }
-        .container { max-width: 100% !important; height: 100%; padding: 0 !important; }
-        #pdf-viewer-area { width: 100%; height: 100%; position: relative; overflow: hidden; display: flex; flex-direction: column; }
-        #viewer-container { flex-grow: 1; overflow: auto; text-align: center; padding: 10px 0; background-color: #525659; transition: background-color 0.3s ease; }
-        #viewer-container.dark-mode { background-color: #212529; }
-        #viewer-container.dark-mode #the-canvas { border-color: #444; }
-        #the-canvas { display: block; margin: 10px auto; border: 1px solid black; direction: ltr; box-shadow: 0 0 10px rgba(0,0,0,0.5); }
-        #pdf-viewer-controls { flex-shrink: 0; background-color: rgba(50, 54, 57, 0.95); padding: 6px 15px; display: flex; justify-content: center; align-items: center; z-index: 15; border-top: 1px solid #6c757d; color: #fff; gap: 10px; }
-        #pdf-viewer-controls .btn, #pdf-viewer-controls .form-control, #pdf-viewer-controls .input-group-text { height: calc(1.5em + 0.5rem + 2px); padding: 0.25rem 0.5rem; font-size: 0.875rem; }
-        #pdf-viewer-controls button { color: #fff; border-color: #6c757d; }
-        #pdf-viewer-controls button:hover { background-color: #6c757d; }
-        #pdf-viewer-controls button:disabled { opacity: 0.5; cursor: not-allowed; }
-        #page-num-controls { display: flex; align-items: center; }
-        #page-num-input { width: 55px; text-align: center; border-radius: 0; -moz-appearance: textfield; }
-        #page-num-input::-webkit-outer-spin-button, #page-num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        #page-num-total { padding: 0.25rem 0.5rem; font-size: 0.875rem; background-color: #495057; border: 1px solid #6c757d; border-left: 0; border-radius: 0 0.25rem 0.25rem 0; }
-        #zoom-controls { display: flex; align-items: center; }
-        #zoom-display { padding: 0.25rem 0.75rem; min-width: 60px; text-align: center; }
-        #theme-toggle-btn { margin-left: auto; }
-        .pdf-loading-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.1rem; color: #fff; background-color: rgba(0, 0, 0, 0.7); padding: 20px 30px; border-radius: 8px; z-index: 20; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .pdf-loading-message.hidden { display: none; }
-    </style>
+
+<style>
+
+html, body {
+height: 100%;
+margin: 0;
+padding: 0;
+
+}
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+    header {
+        flex-shrink: 0; /* Header height is fixed */
+    }
+    /* Make main content area fill remaining vertical space */
+    .main-content-area {
+        flex-grow: 1;
+        display: flex; /* Use flex here */
+        flex-direction: column; /* Stack main/footer if footer uncommented */
+        padding: 0 !important; /* Remove default container padding */
+        margin-top: 0 !important; /* Remove default top margin */
+   
+    }
+    main[role="main"] {
+        flex-grow: 1; /* Make main fill the content area */
+        display: flex; /* Use flex for pdf-viewer-area */
+        padding: 0 !important;
+        margin: 0 !important;
+       
+    }
+
+    /* PDF viewer area takes all available space in main */
+    #pdf-viewer-area {
+        width: 100%;
+        height: 100%;
+        position: relative; /* Context for overlays */
+      
+        display: flex;
+        flex-direction: column; /* Stack canvas container and controls vertically */
+        background-color: var(--viewer-bg, #525659); /* Default background */
+    }
+
+    /* Viewer container scrolls the CANVAS */
+    #viewer-container {
+        flex-grow: 1; /* Takes up available vertical space ABOVE controls */
+        overflow: auto; /* ADDS SCROLLBARS HERE if canvas is larger */
+        text-align: center;
+        padding: 20px 5px; /* Padding around canvas */
+        position: relative;
+        background-color: transparent; /* Background set on parent */
+        transition: background-color 0.3s ease;
+    }
+    #viewer-container.dark-mode {
+         /* CSS variable defined in main site.css dark mode section */
+         --viewer-bg: var(--theme-dark, #212529);
+    }
+    #viewer-container.dark-mode #the-canvas {
+        /* Use variable defined in main site.css dark mode section */
+        border-color: var(--theme-border-color, #444);
+    }
+
+    /* Canvas styling */
+    #the-canvas {
+        display: block;
+        margin: 0 auto; /* Center horizontally */
+        border: 1px solid black; /* Theme this border? */
+        direction: ltr;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        max-width: 100%; /* Prevent horizontal overflow */
+        /* Height is determined by PDF page ratio */
+    }
+
+    /* --- Left/Right Page Navigation Overlays --- */
+    .page-nav-overlay {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10; /* Above canvas */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    #left-page-nav { left: 10px; }
+    #right-page-nav { right: 10px; }
+    .page-nav-overlay button {
+        color: #ffffff;
+        background-color: rgba(40, 40, 40, 0.5);
+        border: none;
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 1.2rem;
+        cursor: pointer;
+        opacity: 0.4; /* Less visible initially */
+        transition: opacity 0.2s ease, background-color 0.2s ease;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    #viewer-container:hover .page-nav-overlay button,
+    .page-nav-overlay button:hover {
+        opacity: 0.9;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+    .page-nav-overlay button:disabled {
+        opacity: 0.2 !important;
+        cursor: not-allowed;
+        background-color: rgba(40, 40, 40, 0.4) !important;
+    }
+
+    /* --- Bottom Controls Bar --- */
+    #pdf-viewer-controls {
+        flex-shrink: 0; /* Prevent shrinking */
+        background-color: rgba(52, 58, 64, 0.95); /* Use var(--theme-navbar-bg)? Needs adjustment */
+        padding: 8px 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        z-index: 15; /* Above top nav overlay */
+        border-top: 1px solid #6c757d; /* Adjust border color if needed */
+        color: #fff;
+        gap: 8px;
+    }
+    /* Control elements sizing */
+    #pdf-viewer-controls .btn,
+    #pdf-viewer-controls .form-control,
+    #pdf-viewer-controls .input-group-text {
+        height: calc(1.5em + 0.5rem + 2px); /* Standard BS sm height */
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    #pdf-viewer-controls button,
+    #pdf-viewer-controls a.btn {
+        color: #fff;
+        border-color: #6c757d;
+        min-width: 36px; /* Minimum touch size */
+        margin: 2px; /* Minimal margin around buttons */
+    }
+    #pdf-viewer-controls button:hover,
+    #pdf-viewer-controls a.btn:hover {
+        background-color: #6c757d; /* Simple hover */
+    }
+    #pdf-viewer-controls button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    /* Page Num Input */
+    #page-num-controls { display: flex; align-items: center; }
+    #page-num-input { width: 50px; text-align: center; border-radius: 0; -moz-appearance: textfield; color: var(--theme-text-base); background-color: var(--theme-card-background); border-color: var(--theme-border-color); }
+    #page-num-input::-webkit-outer-spin-button, #page-num-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    #page-num-total { padding: 0.25rem 0.5rem; font-size: 0.875rem; background-color: #495057; border: 1px solid #6c757d; border-left: 0; border-radius: 0 0.25rem 0.25rem 0; color: #fff; }
+    /* Zoom controls */
+    #zoom-controls { display: flex; align-items: center; }
+    #zoom-display { padding: 0.25rem 0.75rem; min-width: 60px; text-align: center; background-color: rgba(255,255,255,0.1); border-radius: .25rem; }
+    /* Control group */
+    .control-group { display: flex; justify-content: center; align-items: center; gap: 5px; }
+
+    /* Loading indicator */
+    .pdf-loading-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.1rem; color: #fff; background-color: rgba(0, 0, 0, 0.7); padding: 20px 30px; border-radius: 8px; z-index: 20; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .pdf-loading-message.hidden { display: none; }
+
+    /* --- Text Extraction Modal --- */
+    #textExtractionModal .modal-body { background-color: var(--theme-background-base); }
+    #textExtractionResultContent { white-space: pre-wrap; font-family: Consolas, Menlo, Monaco, monospace; max-height: 65vh; overflow-y: auto; background-color: var(--theme-card-background); border: 1px solid var(--theme-border-color); padding: 15px; color: var(--theme-text-base); font-size: 0.9rem; }
+     @@media (prefers-color-scheme: dark) {
+         #textExtractionResultContent { background-color: #212529; border-color: var(--theme-border-color); color: var(--theme-text-base); }
+         #textExtractionModal .modal-content { background-color: var(--theme-card-background); color: var(--theme-text-base); }
+         #textExtractionModal .modal-header, #textExtractionModal .modal-footer { background-color: #212529; border-color: var(--theme-border-color); }
+         #textExtractionModal .modal-title { color: var(--theme-text-base); }
+         #textExtractionModal .btn-close { filter: invert(1) grayscale(100%) brightness(200%); }
+         #textExtractionModal .btn-outline-secondary { color: var(--theme-secondary); border-color: var(--theme-secondary); }
+         #textExtractionModal .btn-outline-secondary:hover { color: #fff; background-color: var(--theme-secondary); }
+     }
+
+    /* --- Mobile Responsiveness --- */
+    @@media (max-width: 767.98px) {
+         /* Bottom controls */
+         #pdf-viewer-controls { padding: 8px; justify-content: space-around; gap: 5px; }
+         .control-group { flex-basis: auto; margin-bottom: 0; }
+         /* Hide Zoom Buttons ONLY */
+         #zoom-controls #zoom-in-btn,
+         #zoom-controls #zoom-out-btn { display: none !important; }
+         /* Order buttons */
+         #theme-toggle-btn { order: 10; margin-left: auto; } /* Push theme right */
+         #extract-current-page-btn, .btn-login-prompt { order: 9; margin-left: 5px;}
+         #page-num-controls { order: 1; } /* Page nav first */
+         /* Top overlay */
+         #top-page-nav-overlay { top: 10px; }
+         .page-nav-overlay button { width: 40px; height: 40px; font-size: 1rem;}
+         #left-page-nav { left: 5px; } #right-page-nav { right: 5px; }
+    }
+    @@media (max-width: 480px) {
+         #zoom-display { display: none !important; } /* Hide zoom display */
+         #page-num-input { width: 40px; }
+         #pdf-viewer-controls { gap: 3px; }
+         #pdf-viewer-controls .btn, #pdf-viewer-controls a.btn { min-width: 32px; margin: 1px;}
+         .page-nav-overlay button { width: 36px; height: 36px; font-size: 0.9rem;}
+    }
+</style>
+
 }
 
-@if (pdfStreamUrl != null) // Check if the URL could be generated
+@if (pdfStreamUrl != null)
 {
-    <div id="pdf-viewer-area">
-        <div id="viewer-container"><canvas id="the-canvas"></canvas></div>
-        <div id="pdf-viewer-controls">
-            <button id="prev-page-btn" class="btn btn-sm btn-outline-light" aria-label="Previous Page"><i class="fas fa-arrow-left"></i></button>
+<div id="pdf-viewer-area">
+@* Top Nav Overlay *@
+<div id="left-page-nav" class="page-nav-overlay">
+<button id="prev-page-btn" class="btn" aria-label="Previous Page" title="Previous Page"><i class="fas fa-chevron-left"></i></button>
+</div>
+<div id="right-page-nav" class="page-nav-overlay">
+<button id="next-page-btn" class="btn" aria-label="Next Page" title="Next Page"><i class="fas fa-chevron-right"></i></button>
+</div>
+
+@* Canvas Container *@
+    <div id="viewer-container"><canvas id="the-canvas"></canvas></div>
+
+    @* Bottom Controls Bar *@
+    <div id="pdf-viewer-controls">
+        @* Page Number Input/Total *@
+        <div class="control-group page-nav-group">
             <div id="page-num-controls" class="input-group input-group-sm">
-                <input type="number" id="page-num-input" class="form-control form-control-sm" aria-label="Current Page" min="1">
+                <input type="number" id="page-num-input" class="form-control form-control-sm" aria-label="Current Page" min="1" value="1">
                 <span class="input-group-text" id="page-num-total">/ ?</span>
             </div>
-            <button id="next-page-btn" class="btn btn-sm btn-outline-light" aria-label="Next Page"><i class="fas fa-arrow-right"></i></button>
-            <div id="zoom-controls" class="ms-3">
-                <button id="zoom-out-btn" class="btn btn-sm btn-outline-light" aria-label="Zoom Out"><i class="fas fa-search-minus"></i></button>
-                <span id="zoom-display" class="mx-1">100%</span>
-                <button id="zoom-in-btn" class="btn btn-sm btn-outline-light" aria-label="Zoom In"><i class="fas fa-search-plus"></i></button>
-            </div>
-            <button id="theme-toggle-btn" class="btn btn-sm btn-outline-light" aria-label="Toggle Theme"><i class="fas fa-moon"></i></button>
         </div>
-        <div id="loading-indicator" class="pdf-loading-message" role="status"><span class="spinner-border spinner-border-sm me-2"></span>Loading PDF...</div>
+        @* Zoom Controls (Buttons hidden on mobile via CSS) *@
+        <div id="zoom-controls" class="control-group zoom-group"> @* Keep div, hide buttons inside *@
+            <button id="zoom-out-btn" class="btn btn-sm btn-outline-light" aria-label="Zoom Out"><i class="fas fa-search-minus"></i></button>
+            <span id="zoom-display" class="mx-1">100%</span>
+            <button id="zoom-in-btn" class="btn btn-sm btn-outline-light" aria-label="Zoom In"><i class="fas fa-search-plus"></i></button>
+        </div>
+        @* Conditional Extract/Login Button *@
+        @if (SignInManager.IsSignedIn(User)) { <button id="extract-current-page-btn" class="btn btn-sm btn-outline-info" aria-label="Extract Text from Current Page" title="Extract Text from Current Page" disabled><i class="fas fa-file-alt"></i> <span class="d-none d-md-inline">Extract Text</span></button> }
+        else { <a asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="@returnUrl" class="btn btn-sm btn-outline-warning btn-login-prompt" title="Login to Extract Text"><i class="fas fa-lock me-1"></i> <span class="d-none d-md-inline">Login to Extract</span></a> }
+        @* Theme Toggle *@
+        <button id="theme-toggle-btn" class="btn btn-sm btn-outline-light" aria-label="Toggle Theme"><i class="fas fa-moon"></i></button>
     </div>
+
+    @* Loading Indicator *@
+    <div id="loading-indicator" class="pdf-loading-message hidden" role="status">
+         <span class="spinner-border spinner-border-sm me-2"></span>Loading PDF...
+    </div>
+</div>
+
 }
-else // This else block handles the case where Url.Action failed (highly unlikely but possible)
+else
 {
-     <div class="alert alert-danger m-4">
-         Error: Could not determine the PDF source URL for this book.
-         <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-link btn-sm mt-1">Back to Details</a>
-     </div>
+<div class="alert alert-danger m-4">
+Error: Could not determine the PDF source URL for this book.
+<a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-link btn-sm mt-1">Back to Details</a>
+</div>
 }
 
+@* --- Text Extraction Modal --- *@
+
+<div class="modal fade" id="textExtractionModal" tabindex="-1" aria-labelledby="textExtractionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="textExtractionModalLabel">Extracted Text (Page <span id="extractedPageNum">?</span>)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="textExtractionResultContent">
+             <p class="text-muted text-center p-3">Click "Extract Text" on the desired page.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-outline-secondary" id="copyExtractedTextBtn"><i class="fas fa-copy"></i> Copy</button>
+        <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 @section Scripts {
-    @if (pdfStreamUrl != null) // Only include script if URL was generated
-    {
-        <script src="~/lib/pdfjs/build/pdf.mjs" type="module"></script>
-        <script type="module">
-            pdfjsLib.GlobalWorkerOptions.workerSrc = '/lib/pdfjs/build/pdf.worker.mjs';
+@* Render AntiForgeryToken if using cookie auth and POST requires it *@
+@Html.AntiForgeryToken()
 
-            const canvas = document.getElementById('the-canvas');
-            const viewerContainer = document.getElementById('viewer-container');
-            const pageNumDisplayInput = document.getElementById('page-num-input');
-            const pageNumTotalSpan = document.getElementById('page-num-total');
-            const prevButton = document.getElementById('prev-page-btn');
-            const nextButton = document.getElementById('next-page-btn');
-            const zoomInButton = document.getElementById('zoom-in-btn');
-            const zoomOutButton = document.getElementById('zoom-out-btn');
-            const zoomDisplay = document.getElementById('zoom-display');
-            const themeToggleButton = document.getElementById('theme-toggle-btn');
-            const loadingIndicator = document.getElementById('loading-indicator');
-            const ctx = canvas?.getContext('2d');
+@if (pdfStreamUrl != null)
+{
+    <script src="~/lib/pdfjs/build/pdf.mjs" type="module"></script>
+    <script type="module">
+        pdfjsLib.GlobalWorkerOptions.workerSrc = '/lib/pdfjs/build/pdf.worker.mjs';
 
-            if (!canvas || !ctx || !pageNumDisplayInput /* etc... */) {
-                console.error("PDF viewer elements initialization failed.");
-            } else {
-                let pdfDoc = null, pageNum = 1, pageRendering = false, pageNumPending = null;
-                let currentScale = 1.0;
-                const MAX_SCALE = 3.0; const MIN_SCALE = 0.25; const ZOOM_INCREMENT = 0.25;
+        // --- DOM Elements ---
+        const canvas = document.getElementById('the-canvas');
+        const viewerContainer = document.getElementById('viewer-container');
+        const pageNumInput = document.getElementById('page-num-input');
+        const pageNumTotalSpan = document.getElementById('page-num-total');
+        const prevButton = document.getElementById('prev-page-btn'); // Top button
+        const nextButton = document.getElementById('next-page-btn'); // Top button
+        const zoomInButton = document.getElementById('zoom-in-btn'); // Bottom button
+        const zoomOutButton = document.getElementById('zoom-out-btn'); // Bottom button
+        const zoomDisplay = document.getElementById('zoom-display');
+        const themeToggleButton = document.getElementById('theme-toggle-btn');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const extractButton = document.getElementById('extract-current-page-btn'); // May be null
+        const textResultModalElement = document.getElementById('textExtractionModal');
+        const textResultContentDiv = document.getElementById('textExtractionResultContent');
+        const textResultPageNumSpan = document.getElementById('extractedPageNum');
+        const copyTextButton = document.getElementById('copyExtractedTextBtn');
+        const ctx = canvas?.getContext('2d', { willReadFrequently: true });
+        let textExtractionModal = null;
 
-                // --- Rendering Function ---
-                const renderPage = async (num) => { pageRendering = true; loadingIndicator?.classList.remove('hidden'); updateNavButtons(); try { const page = await pdfDoc.getPage(num); const viewport = page.getViewport({ scale: currentScale }); canvas.height = viewport.height; canvas.width = viewport.width; const renderContext = { canvasContext: ctx, viewport: viewport }; await page.render(renderContext).promise; pageRendering = false; loadingIndicator?.classList.add('hidden'); if (pageNumPending !== null) { renderPage(pageNumPending); pageNumPending = null; } } catch(err) { console.error("Render error:", err); pageRendering = false; loadingIndicator?.classList.add('hidden'); alert(`Error rendering page ${num}: ${err?.message || err}`); } };
-                const queueRenderPage = num => { if (pageRendering) { pageNumPending = num; } else { renderPage(num); } };
-                const onPrevPage = () => { if (!pdfDoc || pageNum <= 1) return; pageNum--; queueRenderPage(pageNum); };
-                const onNextPage = () => { if (!pdfDoc || pageNum >= pdfDoc.numPages) return; pageNum++; queueRenderPage(pageNum); };
-                const goToPage = (targetPageNum) => { if (!pdfDoc) return; if (targetPageNum >= 1 && targetPageNum <= pdfDoc.numPages) { pageNum = targetPageNum; queueRenderPage(pageNum); } else { pageNumDisplayInput.value = pageNum; } };
-                const updateNavButtons = () => { if (!pdfDoc) { pageNumDisplayInput.value = ''; pageNumTotalSpan.textContent = `/ ?`; prevButton.disabled = true; nextButton.disabled = true; zoomOutButton.disabled = true; zoomInButton.disabled = true; return; }; pageNumDisplayInput.value = pageNum; pageNumTotalSpan.textContent = `/ ${pdfDoc.numPages}`; prevButton.disabled = (pageNum <= 1); nextButton.disabled = (pageNum >= pdfDoc.numPages); zoomOutButton.disabled = (currentScale <= MIN_SCALE); zoomInButton.disabled = (currentScale >= MAX_SCALE); };
-                const updateZoomDisplay = () => { zoomDisplay.textContent = `${Math.round(currentScale * 100)}%`; };
-                const zoomInOut = (direction) => { let newScale = currentScale + (direction * ZOOM_INCREMENT); newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale)); if (newScale !== currentScale) { currentScale = newScale; queueRenderPage(pageNum); updateZoomDisplay(); } };
-                const toggleTheme = () => { viewerContainer.classList.toggle('dark-mode'); const isDarkMode = viewerContainer.classList.contains('dark-mode'); themeToggleButton.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; themeToggleButton.setAttribute('aria-label', isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'); };
-                const handleKeyPress = (e) => { if (e.target.tagName === 'INPUT') return; if (e.key === "ArrowLeft") { onPrevPage(); e.preventDefault(); } if (e.key === "ArrowRight") { onNextPage(); e.preventDefault(); } };
+        // --- State Variables ---
+        let pdfDoc = null; let pageNum = 1; let pageRendering = false; let pageNumPending = null;
+        let currentScale = 1.0; const MAX_SCALE = 3.0; const MIN_SCALE = 0.25; const ZOOM_INCREMENT = 0.25;
+        const BOOK_ID = @Model.Id; const PDF_URL = '@Html.Raw(pdfStreamUrl!)';
 
-                
-                const pdfUrl = '@Html.Raw(pdfStreamUrl!)';
+        // --- Initialization ---
+        if (!canvas || !ctx || !viewerContainer || !pageNumInput || !pageNumTotalSpan || !prevButton || !nextButton /* removed zoom checks */ || !themeToggleButton || !loadingIndicator) {
+            console.error("Core PDF viewer UI elements missing!");
+            showLoadingError('Viewer Initialization Error!');
+        } else {
+            if (textResultModalElement) { textExtractionModal = new bootstrap.Modal(textResultModalElement); }
+            loadDocument();
+            attachEventListeners();
+        }
 
-                if (pdfUrl) {
-                    loadingIndicator?.classList.remove('hidden');
-                    pdfjsLib.getDocument(pdfUrl).promise.then(_pdfDoc => {
-                        pdfDoc = _pdfDoc;
-                        if(pageNumDisplayInput) pageNumDisplayInput.max = pdfDoc.numPages;
-                        updateZoomDisplay(); updateNavButtons(); renderPage(pageNum);
-                    }, reason => {
-                        console.error("PDF Load Error:", reason);
-                        if(loadingIndicator) loadingIndicator.textContent = 'Error loading PDF.';
-                        alert(`Error loading PDF: ${reason?.message || reason}`);
-                    });
-                    // Attach listeners only if elements exist
-                    prevButton?.addEventListener('click', onPrevPage);
-                    nextButton?.addEventListener('click', onNextPage);
-                    zoomInButton?.addEventListener('click', () => zoomInOut(1));
-                    zoomOutButton?.addEventListener('click', () => zoomInOut(-1));
-                    themeToggleButton?.addEventListener('click', toggleTheme);
-                    pageNumDisplayInput?.addEventListener('change', (e) => { const targetPage = parseInt(e.target.value, 10); if (!isNaN(targetPage)) { goToPage(targetPage); } else { if(pageNumDisplayInput) pageNumDisplayInput.value = pageNum; } });
-                    pageNumDisplayInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') { pageNumDisplayInput.dispatchEvent(new Event('change')); e.preventDefault(); } });
-                    document.addEventListener('keydown', handleKeyPress);
-                    viewerContainer?.addEventListener('wheel', (e) => { if (e.ctrlKey || e.metaKey) { e.preventDefault(); const direction = e.deltaY < 0 ? 1 : -1; zoomInOut(direction); } }, { passive: false });
-                } else {
-                     console.error("PDF source URL is unexpectedly null/empty.");
-                     if(loadingIndicator) {
-                         loadingIndicator.textContent = 'Error: PDF source URL could not be generated.';
-                         loadingIndicator.classList.remove('hidden');
-                     }
-                }
+        // --- Core Functions ---
+        async function loadDocument() {
+             if (!PDF_URL) { showLoadingError('Error: PDF source URL is missing.'); disableAllControls(); return; }
+             showLoadingMessage('Loading PDF...');
+             try {
+                 const loadingTask = pdfjsLib.getDocument(PDF_URL);
+                 pdfDoc = await loadingTask.promise;
+                 if (pageNumInput) pageNumInput.max = pdfDoc.numPages;
+                 pageNum = 1;
+                 updateZoomDisplay(); // Update display even if buttons hidden
+                 await renderPage(pageNum);
+             } catch (reason) {
+                 console.error("PDF Load Error:", reason);
+                 showLoadingError(`Error loading PDF: ${reason?.message || 'Unknown error'}`);
+                 disableAllControls();
+             }
+        }
+
+        async function renderPage(num) {
+             if (!pdfDoc || !ctx || pageRendering) return;
+             pageRendering = true; showLoadingMessage('Rendering page...'); updateNavButtons();
+             try {
+                 const page = await pdfDoc.getPage(num);
+                 const viewport = page.getViewport({ scale: currentScale });
+                 canvas.height = viewport.height; canvas.width = viewport.width;
+                 const renderContext = { canvasContext: ctx, viewport: viewport };
+                 await page.render(renderContext).promise;
+             } catch(err) {
+                 console.error(`Render error on page ${num}:`, err);
+                 showLoadingError(`Error rendering page ${num}`);
+             } finally {
+                  pageRendering = false; hideLoadingMessage(); updateNavButtons();
+                  if (pageNumPending !== null) { const pending = pageNumPending; pageNumPending = null; renderPage(pending); }
+             }
+         };
+
+         function queueRenderPage(num) { if (pageRendering) { pageNumPending = num; } else { renderPage(num); } };
+
+        // --- UI Update Functions ---
+         function updateNavButtons() {
+             // Check only for elements that are *always* present
+             if (!pdfDoc || !pageNumInput || !pageNumTotalSpan || !prevButton || !nextButton) return;
+             pageNumInput.value = pageNum; pageNumTotalSpan.textContent = `/ ${pdfDoc.numPages}`;
+             prevButton.disabled = (pageNum <= 1); nextButton.disabled = (pageNum >= pdfDoc.numPages);
+             // Only update zoom buttons if they exist (not hidden by CSS)
+             if (zoomOutButton) zoomOutButton.disabled = (currentScale <= MIN_SCALE);
+             if (zoomInButton) zoomInButton.disabled = (currentScale >= MAX_SCALE);
+             // Update extract button state
+             if (extractButton) extractButton.disabled = pageRendering;
+         };
+         function updateZoomDisplay() { if (zoomDisplay) zoomDisplay.textContent = `${Math.round(currentScale * 100)}%`; };
+         function showLoadingMessage(message) { if(loadingIndicator) { loadingIndicator.textContent = message; loadingIndicator.classList.remove('hidden'); } }
+         function hideLoadingMessage() { if(loadingIndicator) loadingIndicator.classList.add('hidden'); }
+         function showLoadingError(message) { if(loadingIndicator) { loadingIndicator.innerHTML = `<i class="fas fa-exclamation-triangle me-2 text-danger"></i> ${message}`; loadingIndicator.classList.remove('hidden'); } }
+         function disableAllControls(){ if(prevButton) prevButton.disabled = true; if(nextButton) nextButton.disabled = true; if(zoomInButton) zoomInButton.disabled = true; if(zoomOutButton) zoomOutButton.disabled = true; if(extractButton) extractButton.disabled = true; if(pageNumInput) pageNumInput.disabled = true; if(themeToggleButton) themeToggleButton.disabled = true; }
+
+        // --- Event Handlers ---
+        function onPrevPage() { if (!pdfDoc || pageNum <= 1 || pageRendering) return; pageNum--; queueRenderPage(pageNum); };
+        function onNextPage() { if (!pdfDoc || pageNum >= pdfDoc.numPages || pageRendering) return; pageNum++; queueRenderPage(pageNum); };
+        function goToPage(targetPageNum) { if (!pdfDoc || pageRendering) return; if (targetPageNum >= 1 && targetPageNum <= pdfDoc.numPages) { if(targetPageNum !== pageNum) { pageNum = targetPageNum; queueRenderPage(pageNum); } } else { if(pageNumInput) pageNumInput.value = pageNum; } };
+        function zoomInOut(direction) { if(pageRendering) return; let newScale = currentScale + (direction * ZOOM_INCREMENT); newScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, newScale)); if (newScale !== currentScale) { currentScale = newScale; queueRenderPage(pageNum); updateZoomDisplay(); } };
+        function toggleTheme() { if (!viewerContainer || !themeToggleButton) return; viewerContainer.classList.toggle('dark-mode'); const isDarkMode = viewerContainer.classList.contains('dark-mode'); themeToggleButton.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>'; themeToggleButton.setAttribute('aria-label', isDarkMode ? 'Switch to Light Theme' : 'Switch to Dark Theme'); }; 
+        function handleKeyPress(e) { if (document.activeElement?.tagName === 'INPUT') return; if (e.key === "ArrowLeft") { onPrevPage(); e.preventDefault(); } if (e.key === "ArrowRight") { onNextPage(); e.preventDefault(); } };
+        function handleWheelZoom(e) { if (e.ctrlKey || e.metaKey) { e.preventDefault(); const direction = e.deltaY < 0 ? 1 : -1; zoomInOut(direction); } };
+        let initialPinchDistance = 0;
+        function handleTouchStart(e) { if (e.touches.length === 2) { initialPinchDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); }};
+        function handleTouchMove(e) { if (e.touches.length === 2) { e.preventDefault(); const currentDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); if (initialPinchDistance > 0) { const delta = currentDistance - initialPinchDistance; if (Math.abs(delta) > 5) { zoomInOut(delta > 0 ? 0.1 : -0.1); initialPinchDistance = currentDistance; } } } };
+        function handleResize() { if (pdfDoc && !pageRendering) { queueRenderPage(pageNum); } };
+        async function handleExtractText() {
+            if (!pdfDoc || pageRendering || !extractButton || !textExtractionModal || !textResultContentDiv || !textResultPageNumSpan) return;
+            const currentPage = pageNum; const bookId = BOOK_ID;
+            extractButton.disabled = true; extractButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Extracting...';
+            textResultContentDiv.innerHTML = '<p class="text-center text-muted p-3"><span class="spinner-border spinner-border-sm"></span> Working...</p>';
+            textResultPageNumSpan.textContent = currentPage;
+            try {
+                const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+                const headers = { 'Content-Type': 'application/json' };
+                if (tokenInput) { headers['RequestVerificationToken'] = tokenInput.value; }
+                const response = await fetch(`/Books/${bookId}/extract-page-text`, { method: 'POST', headers: headers, body: JSON.stringify({ pageNumber: currentPage }) });
+                const responseText = await response.text();
+                if (response.ok) { textResultContentDiv.textContent = responseText; }
+                else { textResultContentDiv.innerHTML = `<div class="alert alert-warning alert-sm mb-0">Error ${response.status}: ${responseText || 'Failed.'}</div>`; }
+                textExtractionModal.show();
+            } catch (error) {
+                textResultContentDiv.innerHTML = `<div class="alert alert-danger alert-sm mb-0">Request failed: ${error.message}.</div>`;
+                textExtractionModal.show();
+            } finally {
+                extractButton.disabled = false; extractButton.innerHTML = '<i class="fas fa-file-alt"></i> <span class="d-none d-md-inline">Extract Text</span>';
             }
-        </script>
-    }
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+        };
+        function handleCopyText() {
+             if (!textResultContentDiv) return;
+             navigator.clipboard.writeText(textResultContentDiv.textContent || "")
+                .then(() => { if(copyTextButton) { const original = copyTextButton.innerHTML; copyTextButton.disabled = true; copyTextButton.innerHTML = '<i class="fas fa-check"></i> Copied!'; setTimeout(() => { copyTextButton.innerHTML = original; copyTextButton.disabled = false; }, 2000); } })
+                .catch(err => { alert('Failed to copy text.'); });
+        };
+
+        // --- Attach Event Listeners ---
+        function attachEventListeners() {
+            prevButton?.addEventListener('click', onPrevPage); // Top button
+            nextButton?.addEventListener('click', onNextPage); // Top button
+            zoomInButton?.addEventListener('click', () => zoomInOut(1)); // Bottom button (OK if hidden)
+            zoomOutButton?.addEventListener('click', () => zoomInOut(-1)); // Bottom button (OK if hidden)
+            themeToggleButton?.addEventListener('click', toggleTheme);
+            pageNumInput?.addEventListener('change', (e) => { const targetPage = parseInt(e.target.value, 10); if (!isNaN(targetPage)) goToPage(targetPage); else if(pageNumInput) pageNumInput.value = pageNum; });
+            pageNumInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') { pageNumInput.dispatchEvent(new Event('change')); e.preventDefault(); } });
+            document.addEventListener('keydown', handleKeyPress);
+            viewerContainer?.addEventListener('wheel', handleWheelZoom, { passive: false });
+            viewerContainer?.addEventListener('touchstart', handleTouchStart, { passive: true });
+            viewerContainer?.addEventListener('touchmove', handleTouchMove, { passive: false });
+            window.addEventListener('resize', handleResize);
+            extractButton?.addEventListener('click', handleExtractText); // Attach only if button exists
+            copyTextButton?.addEventListener('click', handleCopyText); // Attach only if button exists
+        }
+
+    </script>
+}
+
 }

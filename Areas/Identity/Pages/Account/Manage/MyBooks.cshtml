@@ -36,11 +36,11 @@
                     {
                         <tr>
                             <td class="text-center align-middle">
-                                <img src="@(string.IsNullOrEmpty(item.CoverImageUrl) ? "/images/placeholder-cover.png" : item.CoverImageUrl)"
+                                <img src="@(string.IsNullOrEmpty(item.CoverImageUrl) ? "/images/placeholder-cover.webp" : item.CoverImageUrl)"
                                      alt="Cover for @item.Title"
                                      style="max-height: 50px; width: auto;"
                                      class="img-thumbnail"
-                                     onerror="this.onerror=null; this.src='/images/placeholder-cover.png';" />
+                                     onerror="this.onerror=null; this.src='/images/placeholder-cover.webp';" />
                             </td>
                             <td class="align-middle">@Html.DisplayFor(modelItem => item.Title)</td>
                             <td class="align-middle d-none d-md-table-cell">@(item.Author ?? "N/A")</td>

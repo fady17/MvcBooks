@@ -16,11 +16,11 @@
 
 <div class="row">
     <div class="col-md-4 mb-3 text-center">
-        <img src="@(string.IsNullOrEmpty(Model.CoverImageUrl) ? "/images/placeholder-cover.png" : Model.CoverImageUrl)"
+        <img src="@(string.IsNullOrEmpty(Model.CoverImageUrl) ? "/images/placeholder-cover.webp" : Model.CoverImageUrl)"
              alt="Cover for @Model.Title"
              class="img-fluid rounded shadow-sm"
              style="max-height: 500px;"
-             onerror="this.onerror=null; this.src='/images/placeholder-cover.png';" />
+             onerror="this.onerror=null; this.src='/images/placeholder-cover.webp';" />
 
       <div class="mt-3 d-grid">
           @* --- START: Updated Read Button Logic --- *@

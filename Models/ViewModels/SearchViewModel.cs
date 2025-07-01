@@ -10,5 +10,7 @@ namespace MvcBooks.Models.ViewModels
 
         // The list of books matching the search term
         public List<Book> Results { get; set; } = new List<Book>();
+
+         public List<int> SelectedCategoryIds { get; set; } = new List<int>();
     }
 }

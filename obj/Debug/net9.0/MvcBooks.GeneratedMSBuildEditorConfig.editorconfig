@@ -76,10 +76,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/Users/fady/Desktop/wdt/MvcBooks/Views/Books/Create.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va3MvQ3JlYXRlLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
 [/Users/fady/Desktop/wdt/MvcBooks/Views/Books/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va3MvRGVsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -98,6 +94,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/Users/fady/Desktop/wdt/MvcBooks/Views/Books/ReadPdf.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va3MvUmVhZFBkZi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/Users/fady/Desktop/wdt/MvcBooks/Views/Books/_CreateBookFormPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvQm9va3MvX0NyZWF0ZUJvb2tGb3JtUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/Users/fady/Desktop/wdt/MvcBooks/Views/Home/Index.cshtml]

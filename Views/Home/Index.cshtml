@@ -1,73 +1,49 @@
 ﻿@model MvcBooks.Models.ViewModels.HomeViewModel
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<User> SignInManager
+@using MvcBooks.Common
+@using System.Text.Json 
+@using System.Text.Encodings.Web 
 
 @{
     ViewData["Title"] = "Library Home";
+
+    // --- Prepare Data SERVER-SIDE ---
+
+    // 1. Prepare the object structure needed for JavaScript
+    var categoriesForJs = Model.FilterableCategories?
+        .Select(c => new { id = c.Id, text = c.Name }) // Create anonymous objects
+        ?? Enumerable.Empty<object>();
+
+    var selectedIdsForJs = Model.SelectedCategoryIds ?? new List<int>();
+
+    // 2. Serialize these prepared objects/lists into JSON strings
+    var filterableCategoriesJson = JsonSerializer.Serialize(categoriesForJs);
+    var selectedCategoryIdsJson = JsonSerializer.Serialize(selectedIdsForJs);
+
+    // 3. Escape the JSON strings for safe embedding in JavaScript string literals
+    var escapedFilterableCategoriesJson = JavaScriptEncoder.Default.Encode(filterableCategoriesJson);
+    var escapedSelectedCategoryIdsJson = JavaScriptEncoder.Default.Encode(selectedCategoryIdsJson);
+
+    // Determine display conditions
+    bool filtersApplied = Model.SelectedCategoryIds != null && Model.SelectedCategoryIds.Any();
+    bool showUserHistory = SignInManager.IsSignedIn(User) && Model.UserHistoryBooks.Any() && !filtersApplied;
 }
 
-@* --- Hero Billboard Section (Search Bar Removed) --- *@
+@* --- Hero Billboard Section --- *@
 <div class="hero-billboard">
     <div class="hero-content text-center">
-        @* --- Optional: Restore Original Hero Text --- *@
-         <h1 class="display-5 fw-bold hero-title">Explore Books, For Free!</h1>
-         <p class="fs-5 hero-subtitle">Browse thousands of books across every genre, available here.</p>
-        @* --- End Optional --- *@
+         <h1 class="display-5 fw-bold hero-title">wdt</h1>
+         <p class="fs-5 hero-subtitle"></p>
     </div>
 </div>
-@* --- END Hero Billboard Section --- *@
 
+@* --- Main Content --- *@
+<div class="library-home container mt-4">
 
-<div class="library-home container">
-
-    @* --- START: Filter Section --- *@
-    @if (Model.FilterableCategories.Any())
+    @if (showUserHistory)
     {
-        <div class="card mb-4 shadow-sm filter-card">
-            <div class="card-body">
-                <h5 class="card-title mb-3"><i class="fas fa-filter me-2"></i>Filter by Category</h5>
-                <form method="get" asp-controller="Home" asp-action="Index">
-                    <div class="row filter-options">
-                        @foreach (var category in Model.FilterableCategories)
-                        {
-                            <div class="col-lg-2 col-md-3 col-sm-4 col-6 mb-2">
-                                <div class="form-check">
-                                    <input class="form-check-input"
-                                           type="checkbox"
-                                           name="selectedCategoryIds"
-                                           value="@category.Id"
-                                           id="filter_cat_@category.Id"
-                                           @(Model.SelectedCategoryIds?.Contains(category.Id) ?? false ? "checked" : "") />
-                                    <label class="form-check-label" for="filter_cat_@category.Id">
-                                        @category.Name
-                                    </label>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                    <div class="mt-3 d-flex justify-content-end">
-                        @if (Model.SelectedCategoryIds != null && Model.SelectedCategoryIds.Any())
-                        {
-                             <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary me-2">
-                                <i class="fas fa-times me-1"></i> Clear Filters
-                             </a>
-                        }
-                        <button type="submit" class="btn btn-themed-secondary">
-                           <i class="fas fa-check me-1"></i> Apply Filters
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <hr class="my-4" /> @* Separator after filter section *@
-    }
-    @* --- END: Filter Section --- *@
-
-
-    @* --- START: User History Row (Conditional) --- *@
-    @if (SignInManager.IsSignedIn(User) && Model.UserHistoryBooks.Any() && (Model.SelectedCategoryIds == null || !Model.SelectedCategoryIds.Any()))
-    {
-        <div class="category-row">
+        <div class="category-row user-history-row">
             <h2 class="category-title">My Recently Added Books</h2>
             <div class="book-list-wrapper">
                 <div class="book-list">
@@ -75,36 +51,36 @@
                     {
                         <div class="book-item">
                             <a asp-controller="Books" asp-action="Details" asp-route-id="@book.Id" title="@book.Title">
-                                <img src="@(string.IsNullOrEmpty(book.CoverImageUrl) ? "/images/placeholder-cover.png" : book.CoverImageUrl)"
-                                     alt="Cover for @book.Title"
-                                     class="book-cover"
-                                     onerror="this.onerror=null; this.src='/images/placeholder-cover.png';" />
+                                <img src="@(book.CoverImageUrl ?? Constants.DefaultCoverImagePath)"
+                                     alt="Cover for @book.Title" class="book-cover" loading="lazy" decoding="async"
+                                     onerror="this.onerror=null; this.src='@Constants.DefaultCoverImagePath';" />
                                 <span class="book-title-sm">@book.Title</span>
                             </a>
                         </div>
                     }
                 </div>
             </div>
-             <hr class="my-5"/> @* Separator after user history row *@
+             <hr class="my-5"/>
         </div>
     }
-    @* --- END: User History Row --- *@
 
-
-    @* --- START: Public Category Rows --- *@
     @if (!Model.PublicCategories.Any())
     {
-        <div class="text-center mt-4">
-            @* Display specific message if filters resulted in no matches *@
-            @if (Model.SelectedCategoryIds != null && Model.SelectedCategoryIds.Any())
+        <div class="text-center mt-5 pt-3">
+            @if (filtersApplied)
             {
-                <p>No public books found matching your selected filters.</p>
-                 <a asp-controller="Home" asp-action="Index" class="btn btn-sm btn-link">Clear Filters</a>
+                <p class="lead text-muted">No public books found matching the selected categories.</p>
+                <a href="#" onclick="clearNavbarFilters(); return false;" class="btn btn-sm btn-outline-secondary mt-2">
+                     <i class="fas fa-times me-1"></i> Clear Category Filter
+                </a>
             }
-            @* Display general message only if no filters are applied AND history isn't shown (or user logged out) *@
-            else if (!SignInManager.IsSignedIn(User) || !Model.UserHistoryBooks.Any() || (Model.SelectedCategoryIds != null && Model.SelectedCategoryIds.Any()))
+            else if (!showUserHistory)
             {
-                 <p>No public books found. Check back later or add your own!</p>
+                 <p class="lead text-muted">No public books found.</p>
+                 @if (SignInManager.IsSignedIn(User))
+                 { <p>You can <a asp-controller="Books" asp-action="Create">add your own books</a>!</p> }
+                 else
+                 { <p><a asp-area="Identity" asp-page="/Account/Login">Login</a> or <a asp-area="Identity" asp-page="/Account/Register">Register</a> to add books.</p> }
             }
         </div>
     }
@@ -112,30 +88,82 @@
     {
         @foreach (var category in Model.PublicCategories)
         {
-            <div class="category-row"> @* Removed mb-5 from here, spacing handled by hr or natural flow *@
+            <div class="category-row public-category-row-@category.Id">
                 <h2 class="category-title">@category.Name</h2>
                 <div class="book-list-wrapper">
                     <div class="book-list">
-                        @foreach (var book in category.Books)
+                        @if (!category.Books.Any())
+                        { <p class="text-muted ms-2 fst-italic" style="white-space: normal;">No public books available in this category currently.</p> }
+                        else
                         {
-                            <div class="book-item">
-                                <a asp-controller="Books" asp-action="Details" asp-route-id="@book.Id" title="@book.Title">
-                                    <img src="@(string.IsNullOrEmpty(book.CoverImageUrl) ? "/images/placeholder-cover.png" : book.CoverImageUrl)"
-                                         alt="Cover for @book.Title"
-                                         class="book-cover"
-                                         onerror="this.onerror=null; this.src='/images/placeholder-cover.png';" />
-                                    <span class="book-title-sm">@book.Title</span>
-                                </a>
-                            </div>
+                            @foreach (var book in category.Books)
+                            {
+                                <div class="book-item">
+                                    <a asp-controller="Books" asp-action="Details" asp-route-id="@book.Id" title="@book.Title">
+                                        <img src="@(book.CoverImageUrl ?? Constants.DefaultCoverImagePath)"
+                                             alt="Cover for @book.Title" class="book-cover" loading="lazy" decoding="async"
+                                             onerror="this.onerror=null; this.src='@Constants.DefaultCoverImagePath';" />
+                                        <span class="book-title-sm">@book.Title</span>
+                                    </a>
+                                </div>
+                            }
                         }
                     </div>
                 </div>
             </div>
         }
     }
-    @* --- END: Public Category Rows --- *@
 
-</div> @* End .library-home .container *@
+</div>
 
-@* Section for scripts if needed (e.g., if Font Awesome isn't global) *@
-@* @section Scripts { ... } *@
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        // --- Prepare Data SERVER-SIDE ---
+        var categoriesForJs = Model.FilterableCategories?.Select(c => new { id = c.Id, text = c.Name }) ?? Enumerable.Empty<object>();
+        var selectedIdsForJs = Model.SelectedCategoryIds ?? new List<int>();
+        var filterableCategoriesJson = System.Text.Json.JsonSerializer.Serialize(categoriesForJs);
+        var selectedCategoryIdsJson = System.Text.Json.JsonSerializer.Serialize(selectedIdsForJs);
+        var escapedFilterableCategoriesJson = System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(filterableCategoriesJson);
+        var escapedSelectedCategoryIdsJson = System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(selectedCategoryIdsJson);
+    }
+    <script nonce="RANDOM_NONCE_PLACEHOLDER"> // Add nonce if using CSP
+        // Embed the pre-escaped JSON strings
+        const filterableCategoriesJsonString = '@Html.Raw(escapedFilterableCategoriesJson)';
+        const selectedIdsJsonString = '@Html.Raw(escapedSelectedCategoryIdsJson)';
+
+        // Use DOMContentLoaded to ensure parsing happens after DOM ready AND
+        // to ensure site.js has loaded and defined initializeCategoryDropdown on window
+        document.addEventListener('DOMContentLoaded', () => {
+            let localFilterableCategories = [];
+            let localInitiallySelectedIds = [];
+
+            try {
+                // Parse the JSON strings
+                 if (filterableCategoriesJsonString && filterableCategoriesJsonString !== "''" && filterableCategoriesJsonString !== '""') {
+                     localFilterableCategories = JSON.parse(filterableCategoriesJsonString);
+                 }
+                 if (selectedIdsJsonString && selectedIdsJsonString !== "''" && selectedIdsJsonString !== '""') {
+                     localInitiallySelectedIds = JSON.parse(selectedIdsJsonString).map(String);
+                 }
+            } catch (e) {
+                console.error("Error parsing category data from server:", e); // Keep this critical error log
+            }
+
+            // Explicitly Call the Initialization Function from site.js
+            if (typeof window.initializeCategoryDropdown === 'function') {
+                window.initializeCategoryDropdown(localFilterableCategories, localInitiallySelectedIds);
+            } else {
+                console.error("initializeCategoryDropdown function not found. Check site.js load order.");
+                // Attempt a fallback call after a small delay
+                setTimeout(() => {
+                    if (typeof window.initializeCategoryDropdown === 'function') {
+                        window.initializeCategoryDropdown(localFilterableCategories, localInitiallySelectedIds);
+                    } else {
+                         console.error("initializeCategoryDropdown function STILL not found after delay.");
+                    }
+                }, 100); // Wait 100ms
+            }
+        });
+    </script>
+}

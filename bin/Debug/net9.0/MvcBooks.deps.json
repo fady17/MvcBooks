@@ -14,7 +14,8 @@
           "Microsoft.EntityFrameworkCore.SqlServer": "9.0.4",
           "Microsoft.EntityFrameworkCore.Tools": "9.0.4",
           "Microsoft.VisualStudio.Web.CodeGeneration.Design": "9.0.0",
-          "Minio": "6.0.4"
+          "Minio": "6.0.4",
+          "MuPDFCore": "2.0.1"
         },
         "runtime": {
           "MvcBooks.dll": {}
@@ -1847,6 +1848,161 @@
           }
         }
       },
+      "MuPDFCore/2.0.1": {
+        "dependencies": {
+          "MuPDFCore.NativeAssets.Linux-arm64": "2.0.1",
+          "MuPDFCore.NativeAssets.Linux-musl-arm64": "2.0.1",
+          "MuPDFCore.NativeAssets.Linux-musl-x64": "2.0.1",
+          "MuPDFCore.NativeAssets.Linux-x64": "2.0.1",
+          "MuPDFCore.NativeAssets.Mac-arm64": "2.0.1",
+          "MuPDFCore.NativeAssets.Mac-x64": "2.0.1",
+          "MuPDFCore.NativeAssets.Win-arm64": "2.0.1",
+          "MuPDFCore.NativeAssets.Win-x64": "2.0.1",
+          "MuPDFCore.NativeAssets.Win-x86": "2.0.1",
+          "System.Memory": "4.5.4"
+        },
+        "runtime": {
+          "lib/netstandard2.0/MuPDFCore.dll": {
+            "assemblyVersion": "2.0.1.0",
+            "fileVersion": "2.0.1.0"
+          }
+        }
+      },
+      "MuPDFCore.NativeAssets.Linux-arm64/2.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/MuPDFCore.NativeAssets.Linux-arm64.dll": {
+            "assemblyVersion": "2.0.1.0",
+            "fileVersion": "2.0.1.0"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux-arm64/native/libMuPDFWrapper.so": {
+            "rid": "linux-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "MuPDFCore.NativeAssets.Linux-musl-arm64/2.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/MuPDFCore.NativeAssets.Linux-musl-arm64.dll": {
+            "assemblyVersion": "2.0.1.0",
+            "fileVersion": "2.0.1.0"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux-musl-arm64/native/MuPDFWrapper.so": {
+            "rid": "linux-musl-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "MuPDFCore.NativeAssets.Linux-musl-x64/2.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/MuPDFCore.NativeAssets.Linux-musl-x64.dll": {
+            "assemblyVersion": "2.0.1.0",
+            "fileVersion": "2.0.1.0"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux-musl-x64/native/libMuPDFWrapper.so": {
+            "rid": "linux-musl-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "MuPDFCore.NativeAssets.Linux-x64/2.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/MuPDFCore.NativeAssets.Linux-x64.dll": {
+            "assemblyVersion": "2.0.1.0",
+            "fileVersion": "2.0.1.0"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/libMuPDFWrapper.so": {
+            "rid": "linux-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "MuPDFCore.NativeAssets.Mac-arm64/2.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/MuPDFCore.NativeAssets.Mac-arm64.dll": {
+            "assemblyVersion": "2.0.1.0",
+            "fileVersion": "2.0.1.0"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/osx-arm64/native/libMuPDFWrapper.dylib": {
+            "rid": "osx-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "MuPDFCore.NativeAssets.Mac-x64/2.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/MuPDFCore.NativeAssets.Mac-x64.dll": {
+            "assemblyVersion": "2.0.1.0",
+            "fileVersion": "2.0.1.0"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/osx-x64/native/libMuPDFWrapper.dylib": {
+            "rid": "osx-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "MuPDFCore.NativeAssets.Win-arm64/2.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/MuPDFCore.NativeAssets.Win-arm64.dll": {
+            "assemblyVersion": "2.0.1.0",
+            "fileVersion": "2.0.1.0"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win-arm64/native/MuPDFWrapper.dll": {
+            "rid": "win-arm64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "MuPDFCore.NativeAssets.Win-x64/2.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/MuPDFCore.NativeAssets.Win-x64.dll": {
+            "assemblyVersion": "2.0.1.0",
+            "fileVersion": "2.0.1.0"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win-x64/native/MuPDFWrapper.dll": {
+            "rid": "win-x64",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "MuPDFCore.NativeAssets.Win-x86/2.0.1": {
+        "runtime": {
+          "lib/netstandard2.0/MuPDFCore.NativeAssets.Win-x86.dll": {
+            "assemblyVersion": "2.0.1.0",
+            "fileVersion": "2.0.1.0"
+          }
+        },
+        "runtimeTargets": {
+          "runtimes/win-x86/native/MuPDFWrapper.dll": {
+            "rid": "win-x86",
+            "assetType": "native",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
       "Newtonsoft.Json/13.0.3": {
         "runtime": {
           "lib/net6.0/Newtonsoft.Json.dll": {
@@ -3050,6 +3206,76 @@
       "sha512": "sha512-YqueG52R/Xej4VVbKuRIodjiAhV0HR/XVbLbNrJhCZnzjnSjgMJ/dCdV0akQQxavX6hp/LC6rqLGLcXeQYU7XA==",
       "path": "mono.texttemplating/3.0.0",
       "hashPath": "mono.texttemplating.3.0.0.nupkg.sha512"
+    },
+    "MuPDFCore/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-D8E81whEcxYOvWmf+Pxbprf+H25l5JEgH4v/F0NRzZd7ae/41N/kjzb94nXK1PGmuDoVg5+Cyzct8f7Cqhj2JQ==",
+      "path": "mupdfcore/2.0.1",
+      "hashPath": "mupdfcore.2.0.1.nupkg.sha512"
+    },
+    "MuPDFCore.NativeAssets.Linux-arm64/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ih5iNem7pYqksXZ+7o1/UoC2/B91UPi9kgjPa6ftPfk6JgkAZSmlCY7Vx+IY6QfvU3SXZRHlcC5lUhk4xngaVQ==",
+      "path": "mupdfcore.nativeassets.linux-arm64/2.0.1",
+      "hashPath": "mupdfcore.nativeassets.linux-arm64.2.0.1.nupkg.sha512"
+    },
+    "MuPDFCore.NativeAssets.Linux-musl-arm64/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-v1E4uhKRZIr9+vvUUV/WlwSHtITw34y/IbhPbCm2uqjANAolwFL27X0X+KnM23hLJHQ/R/Grb22UQ1LEAcYO2w==",
+      "path": "mupdfcore.nativeassets.linux-musl-arm64/2.0.1",
+      "hashPath": "mupdfcore.nativeassets.linux-musl-arm64.2.0.1.nupkg.sha512"
+    },
+    "MuPDFCore.NativeAssets.Linux-musl-x64/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-VsCP6IhWnQ8dRuxz4Nw+MSk6t0z0eZzny0otR5+HKZFdEh4VArlEk7eai/4kyGT54r7DXklEg4DnEPMXGu3IJw==",
+      "path": "mupdfcore.nativeassets.linux-musl-x64/2.0.1",
+      "hashPath": "mupdfcore.nativeassets.linux-musl-x64.2.0.1.nupkg.sha512"
+    },
+    "MuPDFCore.NativeAssets.Linux-x64/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ReXRgqqkiVrVpfA63PeI4RvUsTl4jLZqOw8waYftfU3tlv/u2pfmGkkcj1zHTR8ggd8BFwmGc5CEFEwI8+YmSw==",
+      "path": "mupdfcore.nativeassets.linux-x64/2.0.1",
+      "hashPath": "mupdfcore.nativeassets.linux-x64.2.0.1.nupkg.sha512"
+    },
+    "MuPDFCore.NativeAssets.Mac-arm64/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-1grYhnH7pDMj7c5bQmYmNhHBSPRCunrRM8V5llTGA7K8hPN7uLu2kvtHMtZeK9QO0GVf5lUO/o0h02NCVGq+7w==",
+      "path": "mupdfcore.nativeassets.mac-arm64/2.0.1",
+      "hashPath": "mupdfcore.nativeassets.mac-arm64.2.0.1.nupkg.sha512"
+    },
+    "MuPDFCore.NativeAssets.Mac-x64/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-zUAKjHvNG9PW5l+Om1Wu7/a91NaTl42cDxPobrCxB333W1ZguEpfL1Mm2Szv466FAKuTLj/px0R2amtQ/5zrrA==",
+      "path": "mupdfcore.nativeassets.mac-x64/2.0.1",
+      "hashPath": "mupdfcore.nativeassets.mac-x64.2.0.1.nupkg.sha512"
+    },
+    "MuPDFCore.NativeAssets.Win-arm64/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-XqpOZ7YT7hCa+PK2w/03QrtDymOGHoWG6A0eGxyZEJ8/tVrdEr4Rm3ZY6HF+gi1cWM1ZUIywgHGnEonoBh7dlA==",
+      "path": "mupdfcore.nativeassets.win-arm64/2.0.1",
+      "hashPath": "mupdfcore.nativeassets.win-arm64.2.0.1.nupkg.sha512"
+    },
+    "MuPDFCore.NativeAssets.Win-x64/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ORKzH8Ddoznlg2dJ7FdJGGkfso5W6RRgZJqAyRRZoQEkcKF4U9TU8fIVwxIK37i+MgMZ5lzC8plfEy2uxzv6VQ==",
+      "path": "mupdfcore.nativeassets.win-x64/2.0.1",
+      "hashPath": "mupdfcore.nativeassets.win-x64.2.0.1.nupkg.sha512"
+    },
+    "MuPDFCore.NativeAssets.Win-x86/2.0.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Nl7TV+7LlDfN2i2wAk31usewwgE82VVFUP933ESQlWpvNM/s/blDyaPJ8KGAqOZdjzKCU1Q02pJVWW8G3T9nWw==",
+      "path": "mupdfcore.nativeassets.win-x86/2.0.1",
+      "hashPath": "mupdfcore.nativeassets.win-x86.2.0.1.nupkg.sha512"
     },
     "Newtonsoft.Json/13.0.3": {
       "type": "package",

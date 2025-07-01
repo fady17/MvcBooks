@@ -1,0 +1,102 @@
+@model MvcBooks.Models.ViewModels.BookViewModel
+@* No Layout specified here *@
+
+<form asp-controller="Books" asp-action="Create" method="post" enctype="multipart/form-data" id="createBookForm">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-3" role="alert" style="display: none;"></div>
+
+    <h5 class="form-section-header mb-3">Book Details</h5>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="Title" class="form-label"></label>
+            <input asp-for="Title" class="form-control form-control-sm" />
+            <span asp-validation-for="Title" class="text-danger d-block"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="Author" class="form-label"></label>
+            <input asp-for="Author" class="form-control form-control-sm" />
+            <span asp-validation-for="Author" class="text-danger d-block"></span>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control form-control-sm" rows="3"></textarea>
+        <span asp-validation-for="Description" class="text-danger d-block"></span>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label asp-for="PublishedDate" class="form-label"></label>
+            <input asp-for="PublishedDate" type="date" class="form-control form-control-sm" />
+            <span asp-validation-for="PublishedDate" class="text-danger d-block"></span>
+        </div>
+        <div class="col-md-6 mb-3">
+            <label asp-for="CoverImage" class="form-label"><i class="fas fa-image fa-fw me-1"></i>Cover Image</label>
+            <input asp-for="CoverImage" type="file" accept="image/*" class="form-control form-control-sm" />
+            <span asp-validation-for="CoverImage" class="text-danger d-block"></span>
+        </div>
+    </div>
+
+    <h5 class="form-section-header mb-3">Book Content Source</h5>
+    <p class="text-muted mb-3"><small>Provide ONE source: EPUB, PDF, or URL.</small></p>
+
+    <div class="mb-3">
+        <label asp-for="EpubFile" class="form-label"><i class="fas fa-book-open fa-fw me-1"></i>EPUB File</label>
+        <input asp-for="EpubFile" type="file" accept=".epub" class="form-control form-control-sm" />
+        <span asp-validation-for="EpubFile" class="text-danger d-block"></span>
+    </div>
+
+    <div class="text-muted text-center my-2 small">OR</div>
+    <div class="mb-3">
+        <label asp-for="PdfFile" class="form-label"><i class="fas fa-file-pdf fa-fw me-1"></i>PDF File</label>
+        <input asp-for="PdfFile" type="file" accept=".pdf,application/pdf" class="form-control form-control-sm" />
+        <span asp-validation-for="PdfFile" class="text-danger d-block"></span>
+    </div>
+
+    <div class="text-muted text-center my-2 small">OR</div>
+    <div class="mb-3">
+        <label asp-for="BookUrl" class="form-label"><i class="fas fa-link fa-fw me-1"></i>Book URL</label>
+        <input asp-for="BookUrl" type="url" class="form-control form-control-sm" placeholder="https://..." />
+        <span asp-validation-for="BookUrl" class="text-danger d-block"></span>
+    </div>
+
+    <h5 class="form-section-header mb-3">Categorization & Visibility</h5>
+
+    @* --- USE FIELDSET/LEGEND for Categories Group --- *@
+    <fieldset class="mb-3 category-fieldset"> @* Added class for potential styling *@
+        @* Legend acts as the group label. fs-6 makes font size similar to labels. mb-2 adds space below legend. *@
+        <legend class="form-label fs-6 mb-2">Categories</legend>
+
+        @if (Model.AvailableCategories == null || !Model.AvailableCategories.Any())
+        { <div class="alert alert-secondary py-1 px-2 small">No categories found.</div> }
+        else
+        {
+            <div class="checkbox-list-container mb-2 modal-category-scroll">
+                <div class="row checkbox-list">
+                    @foreach (var category in Model.AvailableCategories.OrderBy(c => c.Name))
+                    {
+                        <div class="col-md-6 col-sm-6 mb-1">
+                            <div class="form-check form-check-sm">
+                                <input type="checkbox" name="SelectedCategoryIds" value="@category.Id" id="modal_create_cat_@category.Id" class="form-check-input" />
+                                <label class="form-check-label" for="modal_create_cat_@category.Id">@category.Name</label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            @* Validation for the overall selection *@
+            <span asp-validation-for="SelectedCategoryIds" class="text-danger d-block"></span>
+        }
+    </fieldset>
+    @* --- END FIELDSET --- *@
+
+    @* Visibility Switch remains separate *@
+    <div class="mb-3">
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" asp-for="IsPublic" role="switch">
+            <label class="form-check-label small" asp-for="IsPublic"></label>
+        </div>
+        <small class="form-text text-muted d-block mt-1">Public books are visible to everyone.</small>
+        <span asp-validation-for="IsPublic" class="text-danger d-block"></span>
+    </div>
+
+</form>

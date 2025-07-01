@@ -33,6 +33,7 @@ builder.Services.Configure<MinioOptions>(
 );
 
 builder.Services.AddSingleton<MinioService>();
+builder.Services.AddScoped<IBookContentService, BookContentService>();
 
 var app = builder.Build();
 
@@ -49,6 +50,8 @@ app.UseRouting();
 
 app.UseAuthentication(); 
 app.UseAuthorization();  
+
+app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",
