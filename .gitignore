@@ -135,3 +135,4 @@ docker-compose.override.yml
 .dockerignore
 
 minio-data
+.DS_Store
