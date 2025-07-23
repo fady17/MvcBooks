@@ -1,6 +1,11 @@
 # Prerequisites
 *.vsconfig
+.DS_Store
+.DS_Store
+bin/
+obj/
 
+minio-data/
 # User-specific files
 *.rsuser
 *.suo
@@ -135,3 +140,4 @@ docker-compose.override.yml
 .dockerignore
 
 minio-data
+.DS_Store
