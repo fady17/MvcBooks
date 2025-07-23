@@ -1,7 +1,10 @@
 # Prerequisites
 *.vsconfig
 .DS_Store
-bin
+.DS_Store
+bin/
+obj/
+
 minio-data/
 # User-specific files
 *.rsuser
